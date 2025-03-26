@@ -1,0 +1,17 @@
+# Java (backend)
+**/target/
+*.class
+*.log
+*.iml
+.idea/
+
+# Node (if used later in frontend)
+**/node_modules/
+
+# VSCode / IntelliJ settings
+.vscode/
+*.iml
+
+# OS stuff
+.DS_Store
+Thumbs.db

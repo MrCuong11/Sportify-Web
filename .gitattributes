@@ -1,0 +1,21 @@
+# Set default behavior to automatically normalize line endings to LF
+* text=auto eol=lf
+
+# Java files
+*.java text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# XML and config files
+*.xml text eol=lf
+*.properties text eol=lf
+
+# Scripts
+*.sh text eol=lf
+*.cmd text eol=lf
+*.bat text eol=lf
+
+# Markdown and docs
+*.md text eol=lf
