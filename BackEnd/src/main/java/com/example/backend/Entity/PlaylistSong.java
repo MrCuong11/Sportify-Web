@@ -2,20 +2,26 @@ package com.example.backend.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+
+
 
 @Entity
+@Table(name = "playlist_song")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PlaylistSong {
+
     @Id
-    @GeneratedValue
-    private UUID id;
-    private int position;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    private Integer position;
 
     @ManyToOne
     @JoinColumn(name = "playlist_id")

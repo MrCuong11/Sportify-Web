@@ -2,26 +2,32 @@ package com.example.backend.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+
+
 
 @Entity
+@Table(name = "song")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Song {
+
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
     private String title;
     private String audioUrl;
-    private int duration;
+    private String duration;
     private String lyrics;
-    private int playCount;
+    private Long playCount;
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -41,3 +47,4 @@ public class Song {
     @OneToMany(mappedBy = "song")
     private List<PlaylistSong> playlistSongs;
 }
+
