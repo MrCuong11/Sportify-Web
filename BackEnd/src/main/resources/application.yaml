@@ -12,5 +12,6 @@ spring:
         database-platform: org.hibernate.dialect.MySQLDialect
         hibernate:
             ddl-auto: update
+
 jwt:
     signerKey: "1t0gBYXKEMfj7YBSokSHymnat7CMQBB0gwhw7PnaGWbfHIZdwZ9oTKR2gk7otZWY"

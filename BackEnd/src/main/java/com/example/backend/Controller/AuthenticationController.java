@@ -1,4 +1,4 @@
-package com.example.backend.DTO.Controller;
+package com.example.backend.Controller;
 
 import com.example.backend.DTO.Request.ApiResponse;
 import com.example.backend.DTO.Request.AuthenticationRequest;
