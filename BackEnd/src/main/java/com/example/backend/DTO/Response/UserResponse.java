@@ -17,9 +17,9 @@ public class UserResponse {
 
     private String username;
     private String email;
-    private String password;
+//    private String password;
     private String role;
-    private boolean isPremium;
+    private boolean premium;
     private String themePreference;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

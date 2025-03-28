@@ -4,6 +4,7 @@ import com.example.backend.DTO.Request.UserCreationRequest;
 import com.example.backend.DTO.Request.UserUpdateRequest;
 import com.example.backend.DTO.Response.UserResponse;
 import com.example.backend.Entity.User;
+import com.example.backend.Enums.Roles;
 import com.example.backend.Mapper.UserMapper;
 import com.example.backend.Repository.UserRepository;
 import lombok.AccessLevel;
@@ -22,17 +23,17 @@ import java.util.List;
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
     public UserResponse createUser(UserCreationRequest request){
         if (userRepository.existsByUsername(request.getUsername()))
             throw new RuntimeException("User existed");
 
         User user = userMapper.toUser(request);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         // Set default values
-        user.setRole("user");
+        user.setRole(Roles.USER.name());
         user.setPremium(false);
         user.setThemePreference("light");
         user.setCreatedAt(LocalDateTime.now());
@@ -45,7 +46,6 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         userMapper.updateUser(user, request);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setUpdatedAt(LocalDateTime.now());
 
