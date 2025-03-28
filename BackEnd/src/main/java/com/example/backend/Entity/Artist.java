@@ -29,4 +29,8 @@ public class Artist {
 
     @OneToMany(mappedBy = "artist")
     private List<Song> songs;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
 }
