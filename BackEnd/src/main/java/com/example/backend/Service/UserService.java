@@ -10,6 +10,9 @@ import com.example.backend.Repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,13 +59,31 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
+
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers(){
         return userRepository.findAll().stream()
                 .map(userMapper::toUserResponse).toList();
     }
 
+    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUser(String id){
         return userMapper.toUserResponse(userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found")));
     }
+
+    public UserResponse getMyInfo(){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        User user = userRepository.findByUsername(name).orElseThrow(
+                () -> new RuntimeException("USER_NOT_EXISTED"));
+
+        return userMapper.toUserResponse(user);
+    }
 }
+
+
+//    Access Token = Your entry ticket to the concert. You show it every time you want in.
+//
+//    Refresh Token = Your proof of purchase. If your ticket gets lost (or expires), you use it to get a new one — without buying a new ticket (logging in again). Life cycle is fixed

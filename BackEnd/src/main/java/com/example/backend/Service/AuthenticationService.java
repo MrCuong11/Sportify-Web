@@ -74,7 +74,7 @@ public class AuthenticationService {
                 .subject(user.getUsername())
                 .issuer("nmanhcuong.cpf@gmail.com")
                 .issueTime(new Date())
-                .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
+                .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                 .claim("scope", user.getRole())
                 .build();
 
