@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Quicksand:wght@300&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="../assets/images/shape.png">
+    <link rel="stylesheet" href="../assets/css/style_registerLogin.css">
+
+</head>
+
+<!--Body, specified as login page body-->
+<body class="login">
+    <!--Container of the whole login box-->
+    <div class="containerLogin container">
+
+        <h2 id="formTitle">Đăng Nhập</h2>
+
+        <!--Inputs form-->
+        <form id="form">
+
+            <!--id division-->
+            <label>Email:</label>
+            <input type="text" id="id" placeholder="abc@gmail.com">
+            <label id="idWarning" class="warning"></label>
+
+            <!--password division-->
+            <label>Mật khẩu:</label>
+            <div class="passwordBox">
+                <input type="password" id="password" placeholder="Mật khẩu của bạn">
+                <img src="../assets/images/eye.png" id="seePassword">
+            </div>
+            <label id="passwordWarning" class="warning"></label>
+
+            <!--login options-->
+            <div id="options">
+                <div id="redirects">
+                    <div id="loginRedirect">
+                        <a href="./register.html">Đăng ký</a>
+                    </div>
+
+                    <div id="forgetPassword">
+                        <a href="https://www.linternaute.fr/dictionnaire/fr/definition/tant-pis/">Quên mật khẩu</a>
+                    </div>
+                </div>
+
+                <div id="rememberMeBox">
+                    <label id="rememberMeLabel">Ghi nhớ mật khẩu</label>
+                    <input type="checkbox" id="rememberMe">
+                </div>
+            </div>
+
+            <!--submit button-->
+            <input type="submit" value="Đăng nhập" id="submitButton">
+        </form>
+    </div>
+
+    <!--Container of the alert page telling the user that they had successfully logged in -->
+    <div class="successfulLogin">
+        <h1>Đăng nhập thành công!</h1>
+        <h2 id="loginAlertText"></h2>
+    </div>
+
+    <script src="../js/login.js" type="module"></script>
+</body>
+
+</html>
