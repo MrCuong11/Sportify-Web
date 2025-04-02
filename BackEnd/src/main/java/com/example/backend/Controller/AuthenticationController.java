@@ -3,6 +3,7 @@ package com.example.backend.Controller;
 import com.example.backend.DTO.Request.ApiResponse;
 import com.example.backend.DTO.Request.AuthenticationRequest;
 import com.example.backend.DTO.Request.LogoutRequest;
+import com.example.backend.DTO.Request.RefreshRequest;
 import com.example.backend.DTO.Response.AuthenticationResponse;
 import com.example.backend.Service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
@@ -36,6 +37,15 @@ public class AuthenticationController {
             throws ParseException, JOSEException {
         authenticationService.logout(request);
         return ApiResponse.<Void>builder()
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(result)
                 .build();
     }
 
