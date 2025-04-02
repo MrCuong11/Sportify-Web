@@ -156,7 +156,7 @@ html {
 }
 
 /* Text input boxes styling and positioning */
-#form input[type=text], #form input[type=password]{
+#form input[type=text], #form input[type=password], #form input[type=email]{
     width: 94%;
     height: 20px;
     font-size: 15px;

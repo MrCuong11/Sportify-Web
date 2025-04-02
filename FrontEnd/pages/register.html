@@ -6,11 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng ký</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Quicksand:wght@300&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Quicksand:wght@300&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="../assets/images/shape.png">
     <link rel="stylesheet" href="../assets/css/style_registerLogin.css">
-
 </head>
 
 <!-- Body, specified as register page body -->
@@ -19,32 +17,30 @@
     
     <!-- Container of the whole register box -->
     <div class="containerRegister container">
-
         <h2 id="formTitle">Đăng ký</h2>
 
         <!-- Form container -->
         <form id="form">
-
             <label>Họ Tên:</label>
-            <input type="text" id="username" placeholder="ABC">
-            <label id="idWarning" class="warning"></label>
+            <input type="text" id="username" placeholder="ABC" required>
+            <label id="usernameWarning" class="warning"></label>
 
             <label>Email:</label>
-            <input type="text" id="email" placeholder="abc123@gmail.com">
+            <input type="email" id="email" placeholder="abc123@gmail.com" required>
             <label id="emailWarning" class="warning"></label>
 
             <!-- Passwords boxes container -->
             <span id="passwords">
                 <label>Mật khẩu:</label>
                 <div class="passwordBox">
-                    <input type="password" id="password" placeholder="Mật khẩu của bạn">
+                    <input type="password" id="password" placeholder="Mật khẩu của bạn" required>
                     <img src="../assets/images/eye.png" id="seePassword">
                 </div>
                 <label id="passwordWarning" class="warning"></label>
 
                 <label>Xác nhận mật khẩu:</label>
                 <div class="passwordBox">
-                    <input type="password" id="confirmPassword" placeholder="Mật khẩu của bạn">
+                    <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu" required>
                     <img src="../assets/images/eye.png" id="seeConfirmedPassword">
                 </div>
                 <label id="confirmPasswordWarning" class="warning"></label>
@@ -57,25 +53,20 @@
                         <a href="./login.html">Đăng nhập</a>
                     </div>
                 </div>
-                
-                <div id="rememberMeBox">
-                    <label id="rememberMeLabel">Ghi nhớ mật khẩu</label>
-                    <input type="checkbox" id="rememberMe">
-                </div>
             </div>
 
-            <!--submit button-->
+            <!-- Submit button -->
             <input type="submit" value="Đăng ký" id="submitButton">
         </form>
     </div>
 
-    <!--Container of the alert page telling the user that they had successfully signed in -->
+    <!-- Container of the alert page telling the user that they had successfully signed in -->
     <div class="successfulSignIn">
         <h1>Đăng ký thành công</h1>
         <h2 id="signInAlertText"></h2>
     </div>
 
-    <script src="../js/register.js" type="module"></script>
+    <script src="../js/register_api.js" type="module"></script>
 </body>
 
 </html>

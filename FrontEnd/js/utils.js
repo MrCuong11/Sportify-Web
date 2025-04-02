@@ -20,83 +20,115 @@ export {
  * Yes: save the user's status as direct-login
  * No: save the user's credentials for login verification
  */
-function RememberMe({ email, username=null, password, rememberMe }) {
-    const date = new Date();
-    // Expiring time
-    const expires = "expires=" + date.toUTCString(date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000)));
 
-    // When used in login, retrieve the user's username saved in cookies, as no username will be received as an input
-    if (username == null) username = decodeCValue(email).username;
+// Đăng ký người dùng
+async function registerUser(email, username, password) {
+    const response = await fetch('http://localhost:8081/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, username, password })
+    });
 
-    // JSON of credentials
-    let object;
-
-    // Verify if rememberMe box had been chosen
-    if (rememberMe == false) {
-        // If rememberMe box is not chosen, save login credentials
-        object = {
-            username: username,
-            password: password,
-        };
-        // Save the credentials under a serialized JSON object
-        document.cookie = `${email}=${encodeCValue(object)}; ${expires}; SameSite=None; Secure; path=/;`;
+    if (response.ok) {
+        const data = await response.json();
+        alert("Registration successful!");
     } else {
-        object = {
-            email: email,
-            username: username,
-            password: password,
-        };
-        // If it's chosen, give the user a status of "direct"-login and delete its normal status
-        // Save the credentials under a serialized JSON object
-        document.cookie = `direct=${encodeCValue(object)}; ${expires}; SameSite=None; Secure; path=/;`;
-        deleteCookie(email);
+        alert("Registration failed");
     }
 }
 
-// Retrieve cookie data
+// Đăng nhập người dùng
+async function loginUser(email, password, rememberMe) {
+    const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, rememberMe })
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        const token = data.token;
+        RememberMe({ email, token, rememberMe });  // Save the token in a cookie
+        alert("Login successful!");
+    } else {
+        alert("Login failed");
+    }
+}
+
+function RememberMe({ email, token, rememberMe }) {
+    const date = new Date();
+    // Expiring time
+    const expires = "expires=" + date.toUTCString(date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000))); // 30 ngày
+
+    // If rememberMe is true, store the token in the cookie
+    if (rememberMe) {
+        document.cookie = `auth_token=${token}; ${expires}; SameSite=None; Secure; path=/;`;
+    } else {
+        document.cookie = `auth_token=${token}; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`; // expire immediately when user doesn't want to remember
+    }
+}
+
+// Lấy token từ cookie
+function getToken() {
+    return getCookie('auth_token');
+}
+
+// Kiểm tra phiên đăng nhập (nếu có token hợp lệ trong cookie)
+async function checkSession() {
+    const token = getToken();
+    if (!token) {
+        return null;
+    }
+
+    const response = await fetch('/api/user', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
+    });
+
+    if (response.ok) {
+        const user = await response.json();
+        return user;  // Trả về thông tin người dùng
+    } else {
+        return null;  // Token không hợp lệ hoặc hết hạn
+    }
+}
+
+
+
+// Function that logs out a existing user's session (those who're automatically logged in due to remember-me status)
+// Đăng xuất người dùng
+function logOut() {
+    deleteCookie('auth_token');  // Xóa token
+    alert("Logged out successfully!");
+}
+
+// Lấy giá trị cookie
 function getCookie(name) {
     name = name + "=";
-    // Get decoded cookies
     const cArray = decodeURIComponent(document.cookie).split(';');
-    // Loop through cookie array
     for (let i = 0; i < cArray.length; i++) {
         let cookie = cArray[i];
-        // Removes the first char if it's space, sets cookie to this new string
         while (cookie.charAt(0) == " ") {
-            cookie = cookie.substring(1); 
+            cookie = cookie.substring(1);
         }
-        // Element found, return its values
         if (cookie.indexOf(name) == 0) {
-            return cookie.substring(name.length, cookie.length); // Return cookie values
+            return cookie.substring(name.length, cookie.length);
         }
     }
-    // Return nothing (cookie not found)
     return "";
 }
 
-// Function that logs out a existing user's session (those who're automatically logged in due to remember-me status)
-function logOut() {
-    const id = "direct";
-    const credentials = decodeCValue(id);
-    if (credentials == null) return; // If credentials cannot be found, end function here
-
-    // Expiring time
-    const date = new Date();
-    const expires = "expires=" + date.toUTCString(date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000)));
-
-    // Retrieve informations about the user by deserializing the JSON back to its object
-    let email = credentials.email;
-    let object = {
-        username: credentials.username,
-        password: credentials.password,
-    }
-
-    // Sets new cookie to default standard cookies, save user credentials under a serialized JSON
-    document.cookie = `${email}=${encodeCValue(object)}; ${expires}; SameSite=None; Secure; path=/;`;
-
-    // Delete direct-login cookie
-    deleteCookie(id);
+// Xóa cookie
+function deleteCookie(name) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 }
+
 
 // Function that serializes a JSON cookie value
 function encodeCValue(object) {
@@ -112,10 +144,6 @@ function decodeCValue(name) {
     }
 }
 
-// Function that deletes a cookie data by making it expire immediately
-function deleteCookie(name) {
-    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-}
 
 // EASTER EGG FUNCTION: When eye had been clicked, reveal password
 function showPassword(type) {
