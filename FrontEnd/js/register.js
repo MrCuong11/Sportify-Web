@@ -1,7 +1,8 @@
-import { RememberMe, showPassword, getCookie, logOut, registerUser } from "./utils.js";
+import { RememberMe, showPassword, getCookie, logOut } from "./utils.js";
 
 // Main function
 function main() {
+
     // Trigger register() once the form is submitted, e = event
     document.querySelector("#form").addEventListener("submit", (e) => {
         register(e);
@@ -20,13 +21,16 @@ function main() {
 // Verify if username is correct
 function verifyUsername(username) {
     const warning = document.querySelector("#idWarning");
+    // Check empty username and warn
     if (username.value == "") {
         warning.innerHTML = "*Ce champs est obligatoire";
         return 0;
+    // Check if username contains space, warn if true
     } else if (username.value.search(/\s/g) > -1) {
-        warning.innerHTML = "*Le nom d'utilisateur ne doit pas contenir d'espaces.";
+        warning.innerHTML = "*Le nom d'utilisateur ne doit pas contenir d'espaces."
         return 0;
     }
+    // Erase any previous warnings if all cases are met
     warning.innerHTML = "";
     return 1;
 }
@@ -34,13 +38,21 @@ function verifyUsername(username) {
 // Verify if email format is correct
 function verifyEmail(email) {
     const warning = document.querySelector("#emailWarning");
+    // Check if empty string was submitted
     if (email.value == "") {
         warning.innerHTML = "*Ce champs est obligatoire.";
         return 0;
+    // Search for the presence of "text+@+text" and whitespaces. 
+    // Email = invalid if it contains any whitespace or doesn't contain "text+@+text".
     } else if (email.value.search(/\w+@\w+/g) < 0 || email.value.search(/\s/g) > -1) {
         warning.innerHTML = "*Adresse Email Invalide";
         return 0;
+    // If user already exists, tells the user to login if true
+    } else if (getCookie(email.value) != "" || decodeURIComponent(document.cookie).indexOf(email.value) > -1) {
+        warning.innerHTML = "*Vous êtes déjà inscrit. Veuillez vous connecter.";
+        return 0;
     }
+    // Erase any previous warning if all cases are met
     warning.innerHTML = "";
     return 1;
 }
@@ -48,26 +60,29 @@ function verifyEmail(email) {
 // Verify if password respects criterias
 function verifyPassword(password) {
     const warning = document.querySelector("#passwordWarning");
-    if (password.value.length < 8) {
-        warning.innerHTML = "*Votre mot de passe doit contenir au moins 8 caractères.";
-        return 0;
+    switch (true) {
+        // Check if password length > 8 chars
+        case password.value.length < 8:
+            warning.innerHTML = "*Votre mot de passe doit contenir au moins 8 caractères.";
+            return 0;
+        // Check empty spaces, and warn if true
+        case password.value.search(/\s/g) > -1:
+            warning.innerHTML = "*Votre mot de passe ne doit pas contenir d'espaces.";
+            return 0;
+        // Check if password contains letters, and warn if not
+        case password.value.search(/[A-Za-z]/g) < 0:
+            warning.innerHTML = "*Votre mot de passe doit contenir des lettres.";
+            return 0;
+        // Check if password contains special characters, and warn if not
+        case password.value.search(/([^A-Z0-9a-z\s*])/g) < 0:
+            warning.innerHTML = "*Votre mot de passe doit contenir un caractère spécial.";
+            return 0;
+        // Check if password contains numbers, and warn if not
+        case password.value.search(/([0-9])/g) < 0:
+            warning.innerHTML = "*Votre mot de passe doit obligatoirement contenir un chiffre.";
+            return 0;
     }
-    if (password.value.search(/\s/g) > -1) {
-        warning.innerHTML = "*Votre mot de passe ne doit pas contenir d'espaces.";
-        return 0;
-    }
-    if (password.value.search(/[A-Za-z]/g) < 0) {
-        warning.innerHTML = "*Votre mot de passe doit contenir des lettres.";
-        return 0;
-    }
-    if (password.value.search(/([^A-Z0-9a-z\s*])/g) < 0) {
-        warning.innerHTML = "*Votre mot de passe doit contenir un caractère spécial.";
-        return 0;
-    }
-    if (password.value.search(/([0-9])/g) < 0) {
-        warning.innerHTML = "*Votre mot de passe doit obligatoirement contenir un chiffre.";
-        return 0;
-    }
+    // Erase any previous warning if all cases are met
     warning.innerHTML = "";
     return 1;
 }
@@ -75,20 +90,21 @@ function verifyPassword(password) {
 // Verify if two passwords are identical
 function verifyIdenticalPassword(password, confirmedP) {
     const warning = document.querySelector("#confirmPasswordWarning");
+    // Check if two passwords are identical, if not, warn
     if (password.value != confirmedP.value) {
         warning.innerHTML = "*Les mots de passe ne sont pas identiques.";
         return 0;
     }
+    // Erase any previous warning if the case had been met
     warning.innerHTML = "";
     return 1;
 }
 
 // Register user
-async function register(e) {
+function register(e) {
     // Prevent form submitting automatically and page refreshing
-    e.preventDefault();  // Ngăn không cho form gửi đi và trang refresh lại
-
-    // Get values from form fields
+    e.preventDefault();
+    // Retreat the value of every entry
     const username = document.querySelector("#username");
     const email = document.querySelector("#email");
     const password = document.querySelector("#password");
@@ -99,33 +115,30 @@ async function register(e) {
     let verif2 = verifyEmail(email);
     let verif3 = verifyPassword(password);
     let verif4 = verifyIdenticalPassword(password, confirmedPassword);
-
     // If any verification isn't passed, the function stops here
-    if (verif1 + verif2 + verif3 + verif4 != 4) return;
+    if (verif1+verif2+verif3+verif4 != 4) return;
 
-    // Call the registerUser function to send data to the backend API
-    try {
-        await registerUser(email.value, username.value, password.value);  // Call registerUser
+    // Log out all other user who have existing remember-me sessions
+    logOut();
 
-        // Once registration is successful, you can proceed with RememberMe
-        RememberMe({ email: email.value, username: username.value, password: password.value, rememberMe: rememberMe.checked });
+    // RememberMe() verifies if the box is checked and performs the according actions
+    RememberMe({
+        email : email.value,
+        username : username.value,
+        password : password.value,
+        rememberMe : rememberMe.checked
+    });
 
-        // Handle success and display message
-        document.querySelector(".containerRegister").style.display = "none";
-        document.querySelector("#signInAlertText").innerHTML = `Bienvenue à vos ressources de programmation, ${username.value}!`;
-        document.querySelector(".successfulSignIn").style.display = "block"; // Show success message
-        document.querySelector(".successfulSignIn").style.animation = "popUp linear 5s forwards"; // Animation
-        document.querySelector(".register").style.animation = "blurOut linear 5s forwards"; // Animation
-
-        // Redirect after 5 seconds
-        setTimeout(() => {
-            window.location = "../index.html";
-        }, 5000);
-
-    } catch (error) {
-        alert("Đăng ký thất bại!"); // Display error if registration failed
-    }
+    // Sign in succeeded, proceeds to display a successful sign in text and redirect to another page.
+    document.querySelector(".containerRegister").style.display = "none";
+    // Change the successful sign-in alert text
+    document.querySelector("#signInAlertText").innerHTML = `Bienvenue à vos ressources de programmation, ${username.value}!`
+    document.querySelector(".successfulSignIn").style.display = "block"; // Make the alert text visible
+    document.querySelector(".successfulSignIn").style.animation = "popUp linear 5s forwards"; // Animation
+    document.querySelector(".register").style.animation = "blurOut linear 5s forwards"; // Animation
+    setTimeout(() => {
+        window.location = "../index.html";
+    }, 5000);
 }
-
 
 main();

@@ -6,55 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Quicksand:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Quicksand:wght@300&display=swap"
+        rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="../assets/images/shape.png">
     <link rel="stylesheet" href="../assets/css/style_registerLogin.css">
+
 </head>
 
-<!-- Body, specified as login page body -->
+<!--Body, specified as login page body-->
 <body class="login">
-    <!-- Container of the whole login box -->
+    <!--Container of the whole login box-->
     <div class="containerLogin container">
+
         <h2 id="formTitle">Đăng Nhập</h2>
 
-        <!-- Inputs form -->
+        <!--Inputs form-->
         <form id="form">
-            <label>Email:</label>
-            <input type="email" id="email" placeholder="abc@gmail.com" required>
-            <label id="emailWarning" class="warning"></label>
 
+            <!--id division-->
+            <label>Tên đăng nhập:</label>
+            <input type="text" id="id" placeholder="abcxyz">
+            <label id="idWarning" class="warning"></label>
+
+            <!--password division-->
             <label>Mật khẩu:</label>
             <div class="passwordBox">
-                <input type="password" id="password" placeholder="Mật khẩu của bạn" required>
+                <input type="password" id="password" placeholder="Mật khẩu của bạn">
                 <img src="../assets/images/eye.png" id="seePassword">
             </div>
             <label id="passwordWarning" class="warning"></label>
 
-            <!-- Login options -->
+            <!--login options-->
             <div id="options">
                 <div id="redirects">
-                    <div id="registerRedirect">
+                    <div id="loginRedirect">
                         <a href="./register.html">Đăng ký</a>
                     </div>
 
                     <div id="forgetPassword">
-                        <a href="./forgot_password.html">Quên mật khẩu?</a>
+                        <a href="https://www.linternaute.fr/dictionnaire/fr/definition/tant-pis/">Quên mật khẩu</a>
                     </div>
+                </div>
+
+                <div id="rememberMeBox">
+                    <label id="rememberMeLabel">Ghi nhớ mật khẩu</label>
+                    <input type="checkbox" id="rememberMe">
                 </div>
             </div>
 
-            <!-- Submit button -->
+            <!--submit button-->
             <input type="submit" value="Đăng nhập" id="submitButton">
         </form>
     </div>
 
-    <!-- Container of the alert page telling the user that they had successfully logged in -->
+    <!--Container of the alert page telling the user that they had successfully logged in -->
     <div class="successfulLogin">
         <h1>Đăng nhập thành công!</h1>
         <h2 id="loginAlertText"></h2>
     </div>
 
-    <script src="../js/login_api.js" type="module"></script>
+    <script src="../js/login.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 </body>
 
 </html>

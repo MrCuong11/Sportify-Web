@@ -1,83 +1,122 @@
-import { RememberMe, showPassword, getCookie, logOut } from "./utils.js";
+import { RememberMe, showPassword, getCookie, logOut, encodeCValue, decodeCValue } from "./utils.js";
 
 // Main function
-async function main() {
-    // Kiểm tra nếu người dùng đã chọn "remember me" trước đó
-    const token = getCookie("auth_token");
-    if (token) {
-        const user = await checkSession(token);
-        if (user) {
-            displayLogin(user.username);
-            return;
-        }
-    }
+function main() {
 
-    // Kích hoạt sự kiện đăng nhập khi form được gửi
+    // If the user had previously selected remember-me, directly login the user
+    if (getCookie("direct") != "") {
+        let username = decodeCValue("direct").username;
+        displayLogin(username);
+    } 
+
+    // Trigger login() once the form is submitted, e = event
     document.querySelector("#form").addEventListener("submit", (e) => {
         login(e);
     });
 
-    // Hiển thị mật khẩu khi nhấn vào biểu tượng "mắt"
+    // Show password when the eye had been clicked
     document.querySelector("#seePassword").addEventListener("mousedown", () => {
         showPassword(0);
     });
 }
 
-// Kiểm tra phiên đăng nhập thông qua API
-async function checkSession(token) {
+// Function that verifies if the credentials are correct according to the cookies stored.
+// Function to make API call for login and handle warnings
+// Function to make API call for login and handle warnings
+async function verifyLoginCredentials(id, password) {
+    const idWarning = document.querySelector("#idWarning");
+    const passwordWarning = document.querySelector("#passwordWarning");
+
     try {
-        const response = await fetch("/api/user", {
-            method: "GET",
-            headers: { "Authorization": `Bearer ${token}` },
+        // Make the POST request to the login API
+        const response = await axios.post('http://localhost:8080/auth/token', {
+            username: id,
+            password: password
         });
-        if (response.ok) {
-            return await response.json(); // Trả về thông tin người dùng
+
+        // If the response code is 1000 and authenticated is true, login is successful
+        if (response.data.code === 1000 && response.data.result.authenticated) {
+            // Clear warnings if login is successful
+            idWarning.innerHTML = "";
+            passwordWarning.innerHTML = "";
+
+            // Return the token (or any other necessary data)
+            return {
+                success: true,
+                token: response.data.result.token // Save the token to be used for future requests
+            };
+        } else {
+            // If authentication fails, show an error message
+            idWarning.innerHTML = "*Địa chỉ email hoặc mật khẩu không đúng";
+            passwordWarning.innerHTML = "*Mật khẩu không đúng";
+            return { success: false };
         }
     } catch (error) {
-        console.error("Error checking session:", error);
+        console.error("Login failed:", error);
+        // Handle error in the API request
+        idWarning.innerHTML = "*Địa chỉ email hoặc mật khẩu không đúng";
+        passwordWarning.innerHTML = "*Mật khẩu không đúng";
+        return { success: false, message: "Có lỗi xảy ra. Vui lòng thử lại sau." };
     }
-    return null;
 }
 
-// Hàm hiển thị đăng nhập thành công và chuyển hướng trang
-function displayLogin(username) {
+
+
+// A function that displays the login successful text and redirects the user to the homepage
+function displayLogin(id) {
     document.querySelector(".containerLogin").style.display = "none";
-    document.querySelector("#loginAlertText").innerHTML = `Rebonjour, ${username}!`;
-    document.querySelector(".successfulLogin").style.display = "block";
-    document.querySelector(".successfulLogin").style.animation = "popUp linear 5s forwards";
-    document.querySelector(".login").style.animation = "blurOut linear 5s forwards";
-    
+    document.querySelector("#loginAlertText").innerHTML = `Rebonjour, ${id}!`;
+    // Change the successful login alert text
+    document.querySelector(".successfulLogin").style.display = "block"; // Make the alert text visible
+    document.querySelector(".successfulLogin").style.animation = "popUp linear 5s forwards"; // Animation
+    document.querySelector(".login").style.animation = "blurOut linear 5s forwards"; // Animation
+
+    // Redirect to homepage
     setTimeout(() => {
         window.location = "../index.html";
     }, 5000);
 }
 
-// Xử lý đăng nhập
+// Login handler
 async function login(e) {
+    // Prevent form submitting automatically and page refreshing
     e.preventDefault();
-    
-    const email = document.querySelector("#id").value;
-    const password = document.querySelector("#password").value;
-    const rememberMe = document.querySelector("#rememberMe").checked;
-    
-    try {
-        const response = await fetch("/api/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+    // Retrieve the value of every entry
+    const id = document.querySelector("#id");
+    const password = document.querySelector("#password");
+    const rememberMe = document.querySelector("#rememberMe");
+
+    // Call the verifyLoginCredentials function to check credentials via API
+    const result = await verifyLoginCredentials(id.value, password.value);
+
+    if (result.success) {
+        const token = result.token; // Get the token from the result
+        console.log("Login successful! Token:", token); // Log the token to the console
+
+        //const name = decodeCValue(id.value).username; // Assuming the username is still decoded from cookies or session
+
+        // Log out every user who has existing remember-me sessions
+        logOut();
+        // RememberMe() verifies if the box is checked and performs the according actions
+        RememberMe({
+            email: id.value,
+            password: password.value,
+            rememberMe: rememberMe.checked
         });
-        
-        if (response.ok) {
-            const data = await response.json();
-            RememberMe({ email, token: data.token, rememberMe }); // Lưu token
-            displayLogin(data.username);
+
+        // Save the token in localStorage or sessionStorage for future requests
+        if (rememberMe.checked) {
+            localStorage.setItem('authToken', token);
         } else {
-            document.querySelector("#passwordWarning").innerHTML = "* Email hoặc mật khẩu không chính xác";
+            sessionStorage.setItem('authToken', token);
         }
-    } catch (error) {
-        console.error("Login error:", error);
-        document.querySelector("#passwordWarning").innerHTML = "* Đã xảy ra lỗi, vui lòng thử lại sau.";
+
+        // Login successful, proceed to display a successful login text and redirect to another page
+        displayLogin(name);
+    } else {
+        // If login failed, no need to add any warnings manually, they're set by verifyLoginCredentials
     }
 }
+
 
 main();
