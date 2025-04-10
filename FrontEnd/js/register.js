@@ -101,10 +101,9 @@ function verifyIdenticalPassword(password, confirmedP) {
 }
 
 // Register user
-function register(e) {
-    // Prevent form submitting automatically and page refreshing
+async function register(e) {
     e.preventDefault();
-    // Retreat the value of every entry
+
     const username = document.querySelector("#username");
     const email = document.querySelector("#email");
     const password = document.querySelector("#password");
@@ -115,30 +114,84 @@ function register(e) {
     let verif2 = verifyEmail(email);
     let verif3 = verifyPassword(password);
     let verif4 = verifyIdenticalPassword(password, confirmedPassword);
-    // If any verification isn't passed, the function stops here
-    if (verif1+verif2+verif3+verif4 != 4) return;
 
-    // Log out all other user who have existing remember-me sessions
-    logOut();
+    if (verif1 + verif2 + verif3 + verif4 !== 4) return;
+    console.log(username.value,email.value,password.value);
 
-    // RememberMe() verifies if the box is checked and performs the according actions
-    RememberMe({
-        email : email.value,
-        username : username.value,
-        password : password.value,
-        rememberMe : rememberMe.checked
-    });
-
-    // Sign in succeeded, proceeds to display a successful sign in text and redirect to another page.
-    document.querySelector(".containerRegister").style.display = "none";
-    // Change the successful sign-in alert text
-    document.querySelector("#signInAlertText").innerHTML = `Bienvenue à vos ressources de programmation, ${username.value}!`
-    document.querySelector(".successfulSignIn").style.display = "block"; // Make the alert text visible
-    document.querySelector(".successfulSignIn").style.animation = "popUp linear 5s forwards"; // Animation
-    document.querySelector(".register").style.animation = "blurOut linear 5s forwards"; // Animation
-    setTimeout(() => {
-        window.location = "../index.html";
-    }, 5000);
+    // Gửi dữ liệu tới server
+    try {
+        const response = await axios.post("http://localhost:8080/users", {
+            username: username.value,
+            email: email.value,
+            password: password.value
+        });
+    
+        const result = response.data;
+    
+        if (response.status !== 200 && response.status !== 201) {
+            throw new Error(result.message || "Lỗi khi đăng ký.");
+        }
+    
+        logOut();
+    
+        RememberMe({
+            email: email.value,
+            username: username.value,
+            password: password.value,
+            rememberMe: rememberMe.checked
+        });
+    
+        document.querySelector(".containerRegister").style.display = "none";
+        document.querySelector("#signInAlertText").innerHTML = `Bienvenue à vos ressources de programmation, ${username.value}!`;
+        document.querySelector(".successfulSignIn").style.display = "block";
+        document.querySelector(".successfulSignIn").style.animation = "popUp linear 5s forwards";
+        document.querySelector(".register").style.animation = "blurOut linear 5s forwards";
+    
+        setTimeout(() => {
+            window.location = "../index.html";
+        }, 5000);
+    } catch (error) {
+        alert("Đăng ký thất bại: " + error.message);
+    }
+    
 }
+// async function register(username, email, password) {
+//     const usernameWarning = document.querySelector("#usernameWarning");
+//     const emailWarning = document.querySelector("#emailWarning");
+//     const passwordWarning = document.querySelector("#passwordWarning");
+
+//     try {
+//         const response = await axios.post("http://localhost:8080/users/createUser", {
+//             username: username,
+//             email: email,
+//             password: password
+//         });
+
+//         if (response.data.code === 1000 && response.data.result.success) {
+//             // Xóa thông báo lỗi nếu thành công
+//             usernameWarning.innerHTML = "";
+//             emailWarning.innerHTML = "";
+//             passwordWarning.innerHTML = "";
+
+//             return {
+//                 success: true,
+//                 message: "Đăng ký thành công!"
+//             };
+//         } else {
+//             // Trả về lỗi nếu không thành công
+//             return {
+//                 success: false,
+//                 message: response.data.result.message || "Đăng ký thất bại"
+//             };
+//         }
+//     } catch (error) {
+//         console.error("Register failed:", error);
+//         return {
+//             success: false,
+//             message: "Đăng ký thất bại. Vui lòng thử lại."
+//         };
+//     }
+// }
+
 
 main();

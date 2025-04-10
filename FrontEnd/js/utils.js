@@ -26,7 +26,7 @@ function RememberMe({ email, username=null, password, rememberMe }) {
     const expires = "expires=" + date.toUTCString(date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000)));
 
     // When used in login, retrieve the user's username saved in cookies, as no username will be received as an input
-    if (username == null) username = decodeCValue(email).username;
+    // if (username == null) username = decodeCValue(email).username;
 
     // JSON of credentials
     let object;
