@@ -21,6 +21,7 @@ public class Artist {
     private String id;
 
     private String name;
+    @Column(columnDefinition = "TEXT")
     private String bio;
     private String imageUrl;
 
