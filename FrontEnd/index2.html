@@ -30,7 +30,20 @@
                     <i class="fas fa-microphone"></i>
                 </div>
                 <i class="fas bell fa-bell"></i>
-                <img class="profile-photo" src="assets/images/profilepic.jpg" />
+                <div class="profile-container">
+                    <img class="profile-photo" src="assets/images/profilepic.jpg" onclick="toggleDropdown()" />
+                  
+                    <div class="dropdown-menu" id="profileDropdown">
+                      <ul>
+                        <li><a href="#">Trang cá nhân</a></li>
+                        <li><a href="#">Cài đặt</a></li>
+                        <li><a href="#">Đăng xuất</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                
+        
+           
             </div>
         </header>
 
@@ -640,16 +653,16 @@
             <div id="footer-song-info">
                 <div id="footer-song-image"></div>
                 <div id="footer-song-name">
-                    <span>Peaches</span>
-                    <span class="subtitle">Justin Bieber</span>
+                    <span style="color:white" class="playingSong__title-name" >Peaches</span> 
+                    <span class="subtitle playingSong__title-singer ">Justin Bieber</span>
                 </div>
                 <div>
-                    <span>
-                    <i class="far fa-heart subtitle"></i>
-                </span>
-                    <span>
-                    <i class="fas fa-ban subtitle"></i>
-                </span>
+                    <span class="nav-link">
+	                    <i class="far fa-heart subtitle"></i>
+	                </span>
+                    <span class="nav-link">
+	                    <i class="fas fa-ban subtitle"></i>
+	                </span>
                 </div>
             </div>
 
@@ -657,21 +670,22 @@
             <div id="player">
 
                 <div id="player-control">
-                    <div><i class="fas fa-random"></i></div>
-                    <div><i class="fas fa-step-backward"></i></div>
-                    <div><i class="far fa-pause-circle" style="font-size: 2rem;"></i></div>
-                    <div><i class="fas fa-step-forward"></i></div>
-                    <div><i class="fas fa-redo"></i></div>
+                    <div><i class="fas fa-random playingSong__tool-random " ></i></div>
+                    <div><i class="fas fa-step-backward playingSong__tool-previous" ></i></div>
+                    <div><i class="far fa-pause-circle playingSong__tool-playPause" style="font-size: 2rem;"></i></div>
+                    <div><i class="fas fa-step-forward playingSong__tool-next" ></i></div>
+                    <div><i class="fas fa-redo playingSong__tool-again " ></i></div>
                 </div>
 
                 <div id="player-slider-container">
-                    <div class="subtitle">
+                    <div class="subtitle playingSong__tool-currentTime ">
                         0:00
                     </div>
 
-                    <input type="range" min="0" max="100" value="25">
+                    <input type="range" class="playingSong__tool-seekbar" value="0">
+                    <audio id="audio"  preload="metadata" ></audio>
 
-                    <div class="subtitle">
+                    <div class="subtitle playingSong__tool-musicTime ">
                         4:44
                     </div>
                 </div>
@@ -680,21 +694,24 @@
             <!-- Volume buttom, Expand button -->
             <div class="player-extras">
                 <div>
-                    <i class="fas fa-list-ul"></i>
+                    <i class="fas fa-list-ul" style="color:white;"></i>
                 </div>
                 <div>
-                    <i class="fas fa-laptop"></i>
+                    <i class="fas fa-laptop" style="color:white;"></i>
                 </div>
 
-                <div class="volume-container">
+                <div class="volume-container" style="color:white;">
                     <span><i class="fas fa-volume-up"></i></span>
                     <input type="range" min="0" max="100" value="50" class="slider" id="volume-slider">
                 </div>
-                <div><i class="fas fa-expand"></i></div>
+                <div><i class="fas fa-expand" style="color:white;"></i></div>
             </div>
 
         </footer>
     </div>
+    <script src="./js/playMusic.js"></script>
+    <script src="./js/profile.js"></script>
+
 </body>
 
 </html>

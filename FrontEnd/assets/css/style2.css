@@ -5,6 +5,16 @@ html {
     font-size: 7px;
 }
 
+button {
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: none;
+    outline: none;
+    cursor: pointer;
+  }
+  
+
 
 /* set border-box style for all elements of webpage */
 
@@ -62,7 +72,7 @@ body {
     font-weight: 600;
 }
 
-.searchboxAndProfile-container {
+/* .searchboxAndProfile-container {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -97,19 +107,108 @@ body {
 
 .search-box input:focus {
     outline: none;
-}
+} */
 
-.search-box i {
+/* .search-box i {
     color: white;
-    /* font-size: 2rem; */
-}
+    font-size: 2rem;
+} */
 
-.profile-photo {
+/* .profile-photo {
     width: 3rem;
     height: 3rem;
     border-radius: 1.5rem;
     margin-left: 0.8rem;
-}
+} */
+
+.searchboxAndProfile-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* hoặc space-between nếu cần đẩy về 2 phía */
+    gap: 50px; /* tạo khoảng cách giữa các phần tử */
+    padding: 10px 20px;
+  }
+  
+  .search-box {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 20px;
+    gap: 10px;
+    width: 500px; /* hoặc 100% nếu muốn tự động theo bố cục */
+  }
+  
+  .search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+  }
+  
+  
+  .bell {
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .profile-container {
+    position: relative;
+  }
+  
+  
+
+/* .profile-container {
+    position: relative;
+    display: inline-block;
+  } */
+  
+  .profile-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 60px; /* khoảng cách dưới ảnh */
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    min-width: 150px;
+  }
+  
+  .dropdown-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .dropdown-menu li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .dropdown-menu li:last-child {
+    border-bottom: none;
+  }
+  
+  .dropdown-menu li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .dropdown-menu a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+  }
+  
 
 .bell {
     color: #E7E7E6;
@@ -313,6 +412,27 @@ main {
 
 .icons-container {
     display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+    padding-right: 10px;
+  }
+  
+  .icons-container i {
+    font-size: 18px;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  
+  .icons-container i:hover {
+    color: #ff4d4d; /* ví dụ: màu đỏ cho heart, có thể thay đổi tùy icon */
+    transform: scale(1.2);
+  }
+  
+
+/* .icons-container {
+    display: flex;
     justify-content: space-between;
     align-items: center;
 }
@@ -324,13 +444,20 @@ main {
 
 .add-icon {
     color: #92A6B3;
-}
+} */
 
-.currently-on-song {
+/* .currently-on-song {
     color: #21B6D9;
     transform: rotate(-90deg);
     margin-right: 0.9rem;
+} */
+
+.currently-playing {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-left: 3px solid #1db954;
+    transition: all 0.3s;
 }
+
 
 aside {
     width: 100%;
@@ -442,7 +569,7 @@ aside {
 
 #play-btn-checkbox1:checked~.for-responsiveness>main>.latest-release-container div:nth-child(even) div:first-child>.song-name-and-img-container>.latest-release-img-container>label>i.pause-1,
 #play-btn-checkbox2:checked~.for-responsiveness>main>.latest-release-container div:nth-child(even) div:last-child>.song-name-and-img-container>.latest-release-img-container>label>i.pause-2,
-#play-btn-checkbox3:checked~.for-responsiveness>main>.latest-release-container div:last-child div:first-child>.song-name-and-img-container>.latest-release-img-container>label>i.pause-3,
+#play-btn-checkbox3:checked~.for-responsiveness>main>.latest-release-container div:last-child div:first-child>.song-name-and-img-container>.latest-release-img-container>label>i.pause-3
 {
     height: 1rem;
 }
@@ -598,6 +725,18 @@ footer {
 
 input[type="range"] {
     width: 80%;
+}
+
+.playingSong__tool-random.active,
+.playingSong__tool-again.active {
+    color: #1db954; /* xanh Spotify */
+}
+
+.playingSong__tool-random, .playingSong__tool-previous,
+.playingSong__tool-playPause, .playingSong__tool-next,
+.playingSong__tool-again{
+    cursor: pointer;
+    color: white;
 }
 
 

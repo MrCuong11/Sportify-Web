@@ -1,0 +1,47 @@
+.artist-header {
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    color: white;
+  }
+  
+  .artist-info h1 {
+    font-size: 48px;
+    margin: 0;
+  }
+  
+  .verified {
+    color: #1db954;
+  }
+  
+  .artist-actions {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .play-btn, .follow-btn {
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+  }
+  
+  .play-btn {
+    background-color: #1db954;
+    color: white;
+  }
+  
+  .follow-btn {
+    background-color: transparent;
+    border: 1px solid gray;
+    color: white;
+  }
+  
+  .song-list {
+    margin: 20px;
+  }
+  
