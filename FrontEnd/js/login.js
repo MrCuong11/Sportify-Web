@@ -92,24 +92,27 @@ async function login(e) {
     if (result.success) {
         const token = result.token; // Get the token from the result
         console.log("Login successful! Token:", token); // Log the token to the console
+        // Save token to cookie
+        document.cookie = `authToken=${token}; path=/; max-age=3600`; // Expires in 7 days
+
 
         //const name = decodeCValue(id.value).username; // Assuming the username is still decoded from cookies or session
 
         // Log out every user who has existing remember-me sessions
-        logOut();
+        // logOut();
         // RememberMe() verifies if the box is checked and performs the according actions
-        RememberMe({
-            email: id.value,
-            password: password.value,
-            rememberMe: rememberMe.checked
-        });
+        // RememberMe({
+        //     email: id.value,
+        //     password: password.value,
+        //     rememberMe: rememberMe.checked
+        // });
 
         // Save the token in localStorage or sessionStorage for future requests
-        if (rememberMe.checked) {
-            localStorage.setItem('authToken', token);
-        } else {
-            sessionStorage.setItem('authToken', token);
-        }
+        // if (rememberMe.checked) {
+        //     localStorage.setItem('authToken', token);
+        // } else {
+        //     sessionStorage.setItem('authToken', token);
+        // }
 
         // Login successful, proceed to display a successful login text and redirect to another page
         displayLogin(name);

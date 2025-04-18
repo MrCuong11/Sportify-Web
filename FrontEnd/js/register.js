@@ -148,7 +148,7 @@ async function register(e) {
         document.querySelector(".register").style.animation = "blurOut linear 5s forwards";
     
         setTimeout(() => {
-            window.location = "../index.html";
+            window.location = "../pages/login.html";
         }, 5000);
     } catch (error) {
         alert("Đăng ký thất bại: " + error.message);

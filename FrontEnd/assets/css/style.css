@@ -133,12 +133,22 @@ body {
     /* display: inline-block; */
   }
   
-  .profile-photo {
-    width: 50px;
-    height: 50px;
+  .profile-avatar {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    background-color: #007bff; /* Màu nền avatar */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    text-transform: uppercase;
     cursor: pointer;
+    user-select: none;
   }
+  
   
   .dropdown-menu {
     display: none;
