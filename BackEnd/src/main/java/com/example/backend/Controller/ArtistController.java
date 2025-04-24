@@ -36,7 +36,6 @@ public class ArtistController {
     }
 
     @GetMapping
-    // Thêm @ParameterObject vào tham số Pageable
     public ApiResponse<Page<ArtistResponse>> getAll(@ParameterObject Pageable pageable) {
         Page<ArtistResponse> artistPage = artistService.getAllArtists(pageable);
         return ApiResponse.<Page<ArtistResponse>>builder()

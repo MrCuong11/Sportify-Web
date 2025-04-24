@@ -20,7 +20,7 @@ public class OpenAPIConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Movie App API")
+                        .title("Sportify API")
                         .description("API Docs")
                         .version("1.0.0")
                         .contact(new Contact()

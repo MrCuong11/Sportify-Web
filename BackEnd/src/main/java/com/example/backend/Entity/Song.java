@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -26,7 +27,6 @@ public class Song {
     private String title;
     private String audioUrl;
     private String duration;
-    private String lyrics;
     private Long playCount;
     private LocalDateTime createdAt;
 
@@ -49,5 +49,8 @@ public class Song {
 
     @OneToMany(mappedBy = "song")
     private List<PlaylistSong> playlistSongs;
+
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LyricLine> lyricLines = new ArrayList<>();
 }
 
