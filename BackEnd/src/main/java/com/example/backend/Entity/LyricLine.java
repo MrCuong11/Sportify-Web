@@ -8,8 +8,8 @@ import lombok.Data;
 public class LyricLine {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String timestamp;
 
@@ -22,9 +22,9 @@ public class LyricLine {
 
     public LyricLine() {}
 
-    public LyricLine(String timestamp, String text, Song song) {
-        this.timestamp = timestamp;
-        this.text = text;
-        this.song = song;
-    }
+//    public LyricLine(String timestampStr, String text, Song song) {
+//        this.timestamp = timestampStr;
+//        this.text = text;
+//        this.song = song;
+//    }
 }

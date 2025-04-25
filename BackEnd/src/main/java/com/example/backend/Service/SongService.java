@@ -42,12 +42,12 @@ public class SongService {
         song.setAlbum(album);
 
         // Set lyrics if provided
-        if (request.getLyrics() != null) {
-            List<LyricLine> lyricLines = request.getLyrics().stream()
-                    .map(lr -> new LyricLine(lr.getTimestamp(), lr.getText(), song))
-                    .collect(Collectors.toList());
-            song.setLyricLines(lyricLines);
-        }
+//        if (request.getLyrics() != null) {
+//            List<LyricLine> lyricLines = request.getLyrics().stream()
+//                    .map(lr -> new LyricLine(lr.getTimestamp(), lr.getText(), song))
+//                    .collect(Collectors.toList());
+//            song.setLyricLines(lyricLines);
+//        }
 
         // Save and return response
         Song saved = songRepository.save(song);

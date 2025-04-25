@@ -27,5 +27,6 @@ public interface ArtistMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateArtist(@MappingTarget Artist artist, ArtistCreationRequest request, @Context Country country);
 
+
 }
 

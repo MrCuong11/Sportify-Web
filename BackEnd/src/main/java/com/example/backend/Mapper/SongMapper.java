@@ -29,4 +29,5 @@ public interface SongMapper {
     @Mapping(target = "artistName", source = "artist.name")
     SongSimpleResponse toSimpleResponse(Song song);
 
+
 }

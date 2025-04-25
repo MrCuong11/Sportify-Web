@@ -14,6 +14,6 @@ public class SongRequest {
     private Long categoryId;
     private String albumId;
 
-    private List<LyricLineRequest> lyrics;
+//    private List<LyricLineRequest> lyrics;
 }
 
