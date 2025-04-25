@@ -21,7 +21,6 @@ public class SongService {
 
     private final SongRepository songRepository;
     private final ArtistRepository artistRepository;
-    private final CategoryRepository categoryRepository;
     private final AlbumRepository albumRepository;
     private final SongMapper songMapper;
 
@@ -32,13 +31,13 @@ public class SongService {
         // Set related entities using IDs
         Artist artist = artistRepository.findById(request.getArtistId())
                 .orElseThrow(() -> new IllegalArgumentException("Artist not found"));
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+//        Category category = categoryRepository.findById(request.getCategoryId())
+//                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
         Album album = albumRepository.findById(request.getAlbumId())
                 .orElseThrow(() -> new IllegalArgumentException("Album not found"));
 
         song.setArtist(artist);
-        song.setCategory(category);
+//        song.setCategory(category);
         song.setAlbum(album);
 
         // Set lyrics if provided

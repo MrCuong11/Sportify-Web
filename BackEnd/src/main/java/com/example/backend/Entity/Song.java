@@ -34,9 +34,9 @@ public class Song {
     @JoinColumn(name = "artist_id")
     private Artist artist;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+//    @ManyToOne
+//    @JoinColumn(name = "category_id")
+//    private Category category;
     @ManyToOne
     @JoinColumn(name = "album_id")
     private Album album;

@@ -11,7 +11,7 @@ import org.mapstruct.*;
 public interface SongMapper {
 
     @Mapping(target = "artistName", source = "artist.name")
-    @Mapping(target = "categoryName", source = "category.name")
+//    @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "albumName", source = "album.name")
     @Mapping(target = "lyrics", source = "lyricLines")
     SongResponse toResponse(Song song);
@@ -20,7 +20,7 @@ public interface SongMapper {
     @Mapping(target = "playCount", constant = "0L")
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "artist", ignore = true)  // set manually after mapping
-    @Mapping(target = "category", ignore = true)
+//    @Mapping(target = "category", ignore = true)
     @Mapping(target = "album", ignore = true)
     @Mapping(target = "lyricLines", ignore = true)
     Song toEntity(SongRequest request);

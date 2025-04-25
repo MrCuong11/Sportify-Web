@@ -35,6 +35,7 @@ public class LyricLineController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("songId") String songId) {
 
+//        Check if Song Exists
         Optional<Song> songOptional = songRepository.findById(songId);
         if (songOptional.isEmpty()) {
             return ResponseEntity.badRequest().body("Song with ID " + songId + " not found.");

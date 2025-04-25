@@ -11,7 +11,7 @@ public class SongRequest {
     private String duration;
 
     private String artistId;
-    private Long categoryId;
+//    private Long categoryId;
     private String albumId;
 
 //    private List<LyricLineRequest> lyrics;
