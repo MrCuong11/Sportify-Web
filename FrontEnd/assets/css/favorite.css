@@ -1,0 +1,76 @@
+.liked-header {
+    padding: 40px 30px 0px;
+    background: linear-gradient(to bottom, #696969, #2e2e2e);
+    display: flex;
+    /* align-items: flex-end; */
+    gap: 20px;
+    /* height: 100%; */
+  }
+  
+  .liked-header img {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  .liked-header .info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .info .label {
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #ccc;
+  }
+  
+  .info .title {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 5px 0;
+  }
+  
+  .song-list {
+    padding: 20px 30px;
+    overflow-y: auto;
+  }
+  
+  .song-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+    transition: background 0.2s;
+  }
+  
+  .song-item:hover {
+    background-color: #1a1a1a;
+  }
+  
+  .song-item img {
+    width: 50px;
+    height: 50px;
+    margin-right: 20px;
+    object-fit: cover;
+  }
+  
+  .song-info {
+    flex: 1;
+  }
+  
+  .song-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .song-artist {
+    font-size: 14px;
+    color: #b3b3b3;
+  }
+  
+  .song-duration {
+    margin-left: 20px;
+    color: #b3b3b3;
+  }
+  

@@ -1,0 +1,234 @@
+<!-- The Following code is written by Dhruv Arora (github.com/itsdhruvarora) -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ninja Studio - Music Player</title>
+    <meta content="" name="Ninja Studio's Music Player is a modern, classic and easy to use Web Music Player with interactive UI" />
+    <meta name="description" content="Ninja Studio's Music Player is a modern, classic and easy to use Web Music Player with interactive UI" />
+    <meta name="keywords" content="Ninja, Studio, NinjaStudio, Music, Player" />
+	
+    <meta name="twitter:title" content="Ninja Studio - Music Player" />
+    <meta name="twitter:description" content="Ninja Studio's Music Player is a modern, classic and easy to use Web Music Player with interactive UI" />
+    <meta
+      name="twitter:image"
+      content="/logo.png"
+    />
+
+    <meta charset="UTF-8">
+    <!-- set viewport meta property -->
+    <meta name="viewport" content="Width=device-width, initial-scale=1.0">
+
+    <!-- linking the css file -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/playlist.css">
+
+
+    <!-- use the below to use font-awesome icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="main-container">
+         <header class="header">
+            <div class="logo">
+                <img src="logo.png" />
+                <a href="./index2.html" class="fav">Favourites</a>
+            </div>
+            <div class="searchbox-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search" />
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <i class="fas bell fa-bell"></i>
+                <div class="profile-container">
+                     <!-- Avatar mặc định là chữ cái đầu -->
+                     <div class="profile-avatar" id="profileAvatar" onclick="toggleDropdown()"></div> -->
+                  
+                    <!-- Dropdown menu -->
+                     <div class="dropdown-menu" id="profileDropdown">
+                      <ul>
+                        <li><a href="#">Trang cá nhân</a></li>
+                        <li><a href="#">Cài đặt</a></li>
+                        <li><a href="#" onclick="handleLogout()">Đăng xuất</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  
+            </div>
+        </header>  
+
+        <section class="create-playlist-section">
+            <div class="create-playlist-header">
+              <h2>Playlist của bạn</h2>
+              <button class="btn-create-playlist">+ Tạo playlist</button>
+            </div>
+          
+            <div id="new-playlist-form">
+              <input type="text" id="playlist-name" placeholder="Tên playlist" />
+              <input type="text" id="playlist-desc" placeholder="Mô tả playlist" />
+              <input type="text" id="playlist-image" placeholder="Link ảnh playlist" />
+              <button id="submit-playlist">Tạo</button>
+            </div>
+          
+             <!-- Danh sách các playlist -->
+  <div class="playlist-list">
+    <div class="playlist-card" data-playlist-id="1">
+      <img src="playlist1.jpg" alt="Playlist 1" />
+      <div class="playlist-info">
+        <h3>Chill Thôi</h3>
+        <p>20 bài hát</p>
+      </div>
+    </div>
+
+    <div class="playlist-card" data-playlist-id="2">
+      <img src="playlist2.jpg" alt="Playlist 2" />
+      <div class="playlist-info">
+        <h3>Làm Việc Tập Trung</h3>
+        <p>15 bài hát</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chi tiết playlist sẽ hiển thị ở đây -->
+  <div id="playlist-detail-container"></div>
+
+            
+          </section>
+          
+          
+        
+        
+      
+          
+        
+        
+        
+
+        <div class="for-responsiveness">
+            
+            <div id="lyrics-popup" class="lyrics-popup">
+                <div class="lyrics-overlay">
+                    <div class="lyrics-content">
+                        <div id="lyrics-container"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer>
+                <!-- Song Thumnail, Title, Singer -->
+                <div id="footer-song-info">
+                    <div id="footer-song-image"></div>
+                    <div id="footer-song-name">
+                        <span style="color:white" class="playingSong__title-name" >Peaches</span> 
+                        <span class="subtitle playingSong__title-singer ">Justin Bieber</span>
+                    </div>
+                    <div>
+                        <span class="nav-link">
+                            <i class="far fa-heart subtitle"></i>
+                        </span>
+                        <span class="nav-link">
+                            <i class="fas fa-ban subtitle"></i>
+                        </span>
+                    </div>
+                </div>
+            
+                <!-- Contains Player Controls: Play, Pause, Next, Previous, Shuffle and Repeat with Slider -->
+                <div id="player">
+            
+                    <div id="player-control">
+                        <div><i class="fas fa-random playingSong__tool-random " ></i></div>
+                        <div><i class="fas fa-step-backward playingSong__tool-previous" ></i></div>
+                        <div><i class="far fa-pause-circle playingSong__tool-playPause" style="font-size: 2rem;"></i></div>
+                        <div><i class="fas fa-step-forward playingSong__tool-next" ></i></div>
+                        <div><i class="fas fa-redo playingSong__tool-again " ></i></div>
+                    </div>
+            
+                    <div id="player-slider-container">
+                        <div class="subtitle playingSong__tool-currentTime ">
+                            0:00
+                        </div>
+            
+                        <input type="range" class="playingSong__tool-seekbar" value="0">
+                        <audio id="audio"  preload="metadata" ></audio>
+            
+                        <div class="subtitle playingSong__tool-musicTime ">
+                            4:44
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Volume buttom, Expand button -->
+                <div class="player-extras">
+                    <div>
+                        <i class="fas fa-list-ul" style="color:white;"></i>
+                    </div>
+                    <div>
+                        <i class="fas fa-laptop" style="color:white;"></i>
+                    </div>
+            
+                    <div class="volume-container" style="color:white;">
+                        <span><i class="fas fa-volume-up"></i></span>
+                        <input type="range" min="0" max="100" value="50" class="slider" id="volume-slider">
+                    </div>
+                    <div id="expand-lyrics-btn"><i class="fas fa-expand" ></i></div>
+                </div>
+            
+            </footer>
+              
+       
+    </div>
+    <script src="../js/playMusic.js"></script>
+    <script src="../js/profile.js"></script>
+    <script src="../js/playlist.js"></script>
+    <script>
+        const playlistDetails = {
+          1: {
+            songs: [
+              { title: "Có Em", artist: "Madihu" },
+              { title: "Thức Giấc", artist: "Da LAB" }
+            ]
+          },
+          2: {
+            songs: [
+              { title: "Lofi Buổi Sáng", artist: "W/n" },
+              { title: "3107", artist: "W/n" }
+            ]
+          }
+        };
+      
+        const playlistCards = document.querySelectorAll('.playlist-card');
+        const detailContainer = document.getElementById('playlist-detail-container');
+      
+        playlistCards.forEach(card => {
+          card.addEventListener('click', () => {
+            const playlistId = card.getAttribute('data-playlist-id');
+            const detailData = playlistDetails[playlistId];
+      
+            if (!detailData) return;
+      
+            const songItems = detailData.songs.map((song, i) => 
+              `<li>${i + 1}. ${song.title} – ${song.artist}</li>`
+            ).join('');
+      
+            detailContainer.innerHTML = `
+              <div class="playlist-detail-box">
+                <h3>Chi tiết Playlist</h3>
+                <ul class="song-list">${songItems}</ul>
+                <div class="add-song-form">
+                  <input type="text" placeholder="Tên bài hát" class="song-title" />
+                  <input type="text" placeholder="Tên nghệ sĩ" class="song-artist" />
+                  <button class="btn-add-song">Thêm bài hát</button>
+                </div>
+              </div>
+            `;
+          });
+        });
+      </script>
+      
+</body>
+
+</html>

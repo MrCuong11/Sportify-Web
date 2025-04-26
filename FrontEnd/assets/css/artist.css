@@ -1,47 +1,153 @@
-.artist-header {
-    height: 300px;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: flex-end;
-    padding: 20px;
-    color: white;
-  }
-  
-  .artist-info h1 {
-    font-size: 48px;
-    margin: 0;
-  }
-  
-  .verified {
-    color: #1db954;
-  }
-  
-  .artist-actions {
-    padding: 20px;
-    display: flex;
-    gap: 10px;
-  }
-  
-  .play-btn, .follow-btn {
-    padding: 10px 20px;
-    font-weight: bold;
-    border: none;
-    border-radius: 20px;
-  }
-  
-  .play-btn {
-    background-color: #1db954;
-    color: white;
-  }
-  
-  .follow-btn {
-    background-color: transparent;
-    border: 1px solid gray;
-    color: white;
-  }
-  
-  .song-list {
-    margin: 20px;
-  }
-  
+.artist-hero {
+  position: relative;
+  background-color: #121212;
+  color: white;
+  padding-bottom: 30px;
+}
+
+.artist-banner img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  filter: brightness(0.4);
+}
+
+.artist-details-container {
+  display: flex;
+  align-items: center;
+  padding: 20px 40px;
+  margin-top: -100px;
+  position: relative;
+  z-index: 1;
+}
+
+.artist-avatar img {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 4px solid white;
+  object-fit: cover;
+  margin-right: 30px;
+}
+
+.artist-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.artist-type {
+  font-size: 0.9rem;
+  color: #bbb;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.artist-name {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.monthly-listeners {
+  font-size: 1rem;
+  color: #ccc;
+  margin-top: 8px;
+}
+
+.artist-actions {
+  padding-left: 40px;
+  margin-top: 10px;
+}
+
+.play-button, .follow-button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.play-button {
+  background-color: #1DB954;
+  color: white;
+}
+
+.follow-button {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+}
+
+.play-button:hover {
+  background-color: #1aa34a;
+}
+
+.follow-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.artist-songs {
+  padding: 30px 40px 74px 40px;
+  background-color: #181818;
+  color: white;
+
+}
+
+.artist-songs h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.song-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.song-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #2a2a2a;
+  transition: background-color 0.2s ease;
+}
+
+.song-item:hover {
+  background-color: #242424;
+  cursor: pointer;
+}
+
+.song-index {
+  width: 30px;
+  color: #888;
+  text-align: center;
+}
+
+.song-info {
+  flex: 1;
+  margin-left: 15px;
+}
+
+.song-title {
+  font-weight: 500;
+  margin: 0;
+}
+
+.song-duration {
+  font-size: 0.85rem;
+  color: #bbb;
+  margin: 2px 0 0;
+}
+
+.song-actions i {
+  color: #ccc;
+  margin-left: 15px;
+  transition: color 0.2s ease;
+}
+
+.song-actions i:hover {
+  color: #1db954;
+}
+

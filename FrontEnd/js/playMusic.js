@@ -17,6 +17,35 @@ document.addEventListener("DOMContentLoaded", function () {
     const artistEl = document.querySelector(".playingSong__title-singer");
     const imageEl = document.getElementById("footer-song-image");
 
+
+    if (!token) {
+        // Disable seekbar
+        const seekbar = document.querySelector(".playingSong__tool-seekbar");
+        seekbar.disabled = true;
+        seekbar.style.opacity = 0.5;
+        seekbar.title = "Đăng nhập để tua bài hát";
+
+        // Disable xem lyrics
+        const expandLyricsBtn = document.getElementById("expand-lyrics-btn");
+        expandLyricsBtn.style.pointerEvents = "none";
+        expandLyricsBtn.style.opacity = 0.5;
+        expandLyricsBtn.title = "Đăng nhập để xem lời bài hát";
+
+        const shuffleBtn = document.querySelector(".playingSong__tool-random");
+        shuffleBtn.style.pointerEvents ="none";
+        shuffleBtn.style.opacity = 0.5;
+        const repeatBtn = document.querySelector(".playingSong__tool-again");
+        repeatBtn.style.pointerEvents="none";
+        repeatBtn.style.opacity=0.5;
+
+        // Optionally: disable next/prev if cần
+        document.querySelector(".playingSong__tool-next").style.pointerEvents = "none";
+        document.querySelector(".playingSong__tool-next").style.opacity = 0.5;
+
+        document.querySelector(".playingSong__tool-previous").style.pointerEvents = "none";
+        document.querySelector(".playingSong__tool-previous").style.opacity = 0.5;
+    }
+
    
 
     let isPlaying = false;
@@ -24,44 +53,62 @@ document.addEventListener("DOMContentLoaded", function () {
     let isShuffle = false;
     let isRepeat = false;
 
-    const playlist = [
-        {
-            name:'Những Lời Hứa Bỏ Quên',
-            artist:' Vũ. ft Dear Jane ',
-            src: './assets/music/nhungloihuaborquen.mp3',
-            image: './assets/images/nhungloihuaborquen.jpg'
-        },
-        {
-            name:'Bạn Đời',
-            artist:' Karik ft GDucky ',
-            src: './assets/music/bandoi.mp3',
-            image: './assets/images/bandoi.jpg'
-        },
-        {
-            name:'Dân Chơi Sao Phải Khóc',
-            artist:' Ryhder ft Andree Right Hand ',
-            src: './assets/music/danchoisaophaikhoc.mp3',
-            image: './assets/images/song1.jpg'
-        },
-        {
-            name:'Não Cá Vàng',
-            artist:' Only C ft Lou Hoàng ',
-            src: './assets/music/naocavang.mp3',
-            image: './assets/images/naocavang.jpg'
-        },
-        {
-            name:'Hư Không',
-            artist:' Kha ',
-            src: './assets/music/hukhong.mp3',
-            image: './assets/images/hukhong.jpg'
-        },
-        {
-            name:'Id 2022',
-            artist:' Wn/ ',
-            src: './assets/music/id2022.mp3',
-            image: './assets/images/id.jpg'
-        }
-    ];
+    // const playlist = [
+    //     {
+    //         name: 'Những Lời Hứa Bỏ Quên',
+    //         artist: 'Vũ. ft Dear Jane',
+    //         artistSlugs: ['vu', 'dear-jane'],
+    //         src: './assets/music/nhungloihuaborquen.mp3',
+    //         image: './assets/images/nhungloihuaborquen.jpg'
+    //       },
+    //       {
+    //         name: 'Bạn Đời',
+    //         artist: 'Karik ft GDucky',
+    //         artistSlugs: ['karik', 'gducky'],
+    //         src: './assets/music/bandoi.mp3',
+    //         image: './assets/images/bandoi.jpg'
+    //       },
+    //       {
+    //         name: 'Dân Chơi Sao Phải Khóc',
+    //         artist: 'Ryhder ft Andree Right Hand',
+    //         artistSlugs: ['ryhder', 'andree'],
+    //         src: './assets/music/danchoisaophaikhoc.mp3',
+    //         image: './assets/images/song1.jpg'
+    //       },
+    //       {
+    //         name: 'Não Cá Vàng',
+    //         artist: 'Only C ft Lou Hoàng',
+    //         artistSlugs: ['onlyc', 'lou-hoang'],
+    //         src: './assets/music/naocavang.mp3',
+    //         image: './assets/images/naocavang.jpg'
+    //       },
+    //       {
+    //         name: 'Hư Không',
+    //         artist: 'Kha',
+    //         artistSlugs: ['kha'],
+    //         src: './assets/music/hukhong.mp3',
+    //         image: './assets/images/hukhong.jpg'
+    //       },
+    //       {
+    //         name: 'Id 2022',
+    //         artist: 'Wn',
+    //         artistSlugs: ['wn'],
+    //         src: './assets/music/id2022.mp3',
+    //         image: './assets/images/id.jpg'
+    //       }
+    // ];
+
+    let playlist = [];
+
+fetch('./data/songs.json')
+  .then(response => response.json())
+  .then(data => {
+      playlist = data;
+      loadSong(currentSongIndex);
+      renderQueue();
+      renderLatestReleases();
+  })
+  .catch(error => console.error("Error loading playlist:", error));
 
     function loadSong(index) {
         const song = playlist[index];
@@ -204,46 +251,84 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Latest Release
-    const cards = document.querySelectorAll(".latest-release-card");
-
-    cards.forEach((card, index) => {
-        const song = playlist[index];
-        if (!song) return; // Tránh lỗi nếu số card > số bài hát
-
-        // Set tên bài hát
-        const nameElement = card.querySelector(".song-name");
-        if (nameElement) nameElement.textContent = song.name;
-
-        // Set nghệ sĩ
-        const artistElement = card.querySelector(".date");
-        if (artistElement) artistElement.textContent = song.artist;
-
-        // Set ảnh nền cho khung ảnh
-        const imgContainer = card.querySelector(".latest-release-img-container");
-        if (imgContainer) {
-            imgContainer.style.backgroundImage = `url('${song.image}')`;
-            imgContainer.style.backgroundSize = 'cover';
-            imgContainer.style.backgroundPosition = 'center';
-        }
-
-        const audio = new Audio(song.src);
-        audio.addEventListener("loadedmetadata", () => {
-            const durationElement = card.querySelector(".time");
-            if (durationElement) {
-                durationElement.textContent = formatTime(audio.duration);
+    function renderLatestReleases() {
+        const cards = document.querySelectorAll(".latest-release-card");
+    
+        cards.forEach((card, index) => {
+            const song = playlist[index];
+            if (!song) return;
+    
+            const nameElement = card.querySelector(".song-name");
+            if (nameElement) nameElement.textContent = song.name;
+    
+            const artistElement = card.querySelector(".date");
+            if (artistElement) artistElement.textContent = song.artist;
+    
+            const imgContainer = card.querySelector(".latest-release-img-container");
+            if (imgContainer) {
+                imgContainer.style.backgroundImage = `url('${song.image}')`;
+                imgContainer.style.backgroundSize = 'cover';
+                imgContainer.style.backgroundPosition = 'center';
             }
+    
+            const audio = new Audio(song.src);
+            audio.addEventListener("loadedmetadata", () => {
+                const durationElement = card.querySelector(".time");
+                if (durationElement) {
+                    durationElement.textContent = formatTime(audio.duration);
+                }
+            });
+    
+            card.addEventListener("click", () => {
+                currentSongIndex = index;
+                loadSong(currentSongIndex);
+                playSong();
+                renderQueue();
+            });
         });
+    }
+    
 
-        card.addEventListener("click", () => {
-            currentSongIndex = index;
-            loadSong(currentSongIndex);
-            playSong();
-            renderQueue();
-        });
+    // // Latest Release
+    // const cards = document.querySelectorAll(".latest-release-card");
+
+    // cards.forEach((card, index) => {
+    //     const song = playlist[index];
+    //     if (!song) return; // Tránh lỗi nếu số card > số bài hát
+
+    //     // Set tên bài hát
+    //     const nameElement = card.querySelector(".song-name");
+    //     if (nameElement) nameElement.textContent = song.name;
+
+    //     // Set nghệ sĩ
+    //     const artistElement = card.querySelector(".date");
+    //     if (artistElement) artistElement.textContent = song.artist;
+
+    //     // Set ảnh nền cho khung ảnh
+    //     const imgContainer = card.querySelector(".latest-release-img-container");
+    //     if (imgContainer) {
+    //         imgContainer.style.backgroundImage = `url('${song.image}')`;
+    //         imgContainer.style.backgroundSize = 'cover';
+    //         imgContainer.style.backgroundPosition = 'center';
+    //     }
+
+    //     const audio = new Audio(song.src);
+    //     audio.addEventListener("loadedmetadata", () => {
+    //         const durationElement = card.querySelector(".time");
+    //         if (durationElement) {
+    //             durationElement.textContent = formatTime(audio.duration);
+    //         }
+    //     });
+
+    //     card.addEventListener("click", () => {
+    //         currentSongIndex = index;
+    //         loadSong(currentSongIndex);
+    //         playSong();
+    //         renderQueue();
+    //     });
 
         
-    });
+    // });
 
    
 
@@ -260,9 +345,7 @@ function formatTime(seconds) {
     
 
 
-    loadSong(currentSongIndex); // Load bài đầu tiên
-    renderQueue();
-    // renderLatestReleases();
+   
 
 
    
@@ -361,7 +444,7 @@ expandLyricsBtn.addEventListener("click", () => {
         lyricsPopup.style.display = "flex";
         loadLyrics(); // Tải lyrics khi mở
     }
-
+    //  console.log("lỗi")
     expandLyricsBtn.classList.toggle("active", !isVisible);
 
 });

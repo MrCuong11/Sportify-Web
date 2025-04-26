@@ -1,0 +1,29 @@
+[
+    {
+      "name": "Sơn Tùng M-TP",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmNlOIn9ZFO5T8JmeihWWk4eoHRFiquC6YjQ&s",
+      "link": "artist.html?name=son-tung"
+    },
+    {
+      "name": "Vũ.",
+      "imageUrl": "./assets/images/bandoi.jpg",
+      "link": "./pages/artist.html?name=vu."
+    },
+    {
+      "name": "Đen Vâu",
+      "imageUrl": "./assets/images/bandoi.jpg",
+      "link": "artist.html?name=den-vau"
+    },
+    {
+      "name": "Min",
+      "imageUrl": "./assets/images/bandoi.jpg",
+      "link": "artist.html?name=min"
+    },
+    {
+      "name": "Erik",
+      "imageUrl": "./assets/images/bandoi.jpg",
+      "link": "artist.html?name=erik"
+    }
+    
+  ]
+  

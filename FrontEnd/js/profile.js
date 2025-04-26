@@ -1,4 +1,23 @@
 
+document.addEventListener("DOMContentLoaded", function () {
+  const token = getCookie("authToken");
+  const authSection = document.getElementById("authSection");
+  const loginRegister = document.getElementById("loginRegister");
+
+  if (token) {
+    authSection.style.display = "block";
+    loginRegister.style.display = "none";
+
+    const username = getUsernameFromToken(token);
+    if (username) {
+      setDefaultProfileAvatar(username);
+    }
+  } else {
+    authSection.style.display = "none";
+    loginRegister.style.display = "block";
+  }
+});
+
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -64,8 +83,6 @@ const username = getUsernameFromToken(token);
 console.log("Username:", username); // --> "hieulx"
 
 
-
-
 function setDefaultProfileAvatar(username) {
   const avatar = document.getElementById('profileAvatar');
   const firstChar = username.charAt(0).toUpperCase();
@@ -74,9 +91,6 @@ function setDefaultProfileAvatar(username) {
 
 setDefaultProfileAvatar(username);
 
-
-  
-  
   function toggleDropdown() {
     const dropdown = document.getElementById('profileDropdown');
     dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
@@ -86,10 +100,18 @@ setDefaultProfileAvatar(username);
   window.addEventListener('click', function (e) {
     const dropdown = document.getElementById('profileDropdown');
     const profilePhoto = document.querySelector('.profile-photo');
+    
+    if (!dropdown || !profilePhoto) return;
+
     if (!profilePhoto.contains(e.target) && !dropdown.contains(e.target)) {
       dropdown.style.display = 'none';
     }  
   });  
 
+ 
+  
+
+
+  
 
 
