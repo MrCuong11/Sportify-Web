@@ -10,4 +10,6 @@ public class ArtistListResponse {
         this.id = id;
         this.name = name;
     }
+    public ArtistListResponse() {
+    }
 }
