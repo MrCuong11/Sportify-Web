@@ -31,23 +31,11 @@ public class SongService {
         // Set related entities using IDs
         Artist artist = artistRepository.findById(request.getArtistId())
                 .orElseThrow(() -> new IllegalArgumentException("Artist not found"));
-//        Category category = categoryRepository.findById(request.getCategoryId())
-//                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
         Album album = albumRepository.findById(request.getAlbumId())
                 .orElseThrow(() -> new IllegalArgumentException("Album not found"));
 
         song.setArtist(artist);
-//        song.setCategory(category);
         song.setAlbum(album);
-
-        // Set lyrics if provided
-//        if (request.getLyrics() != null) {
-//            List<LyricLine> lyricLines = request.getLyrics().stream()
-//                    .map(lr -> new LyricLine(lr.getTimestamp(), lr.getText(), song))
-//                    .collect(Collectors.toList());
-//            song.setLyricLines(lyricLines);
-//        }
-
         // Save and return response
         Song saved = songRepository.save(song);
         return songMapper.toResponse(saved);

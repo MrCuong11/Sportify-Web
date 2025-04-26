@@ -15,7 +15,7 @@ public class SongResponse {
     private String createdAt;
 
     private String artistName;
-//    private String categoryName;
+    private String imgUrl;
     private String albumName;
 
     private List<LyricLineRequest> lyrics;
