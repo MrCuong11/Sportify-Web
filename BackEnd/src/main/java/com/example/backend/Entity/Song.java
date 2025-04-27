@@ -27,6 +27,7 @@ public class Song {
     private String title;
     private String audioUrl;
     private String duration;
+    private String imgUrl;
     private Long playCount;
     private LocalDateTime createdAt;
 
@@ -34,9 +35,6 @@ public class Song {
     @JoinColumn(name = "artist_id")
     private Artist artist;
 
-//    @ManyToOne
-//    @JoinColumn(name = "category_id")
-//    private Category category;
     @ManyToOne
     @JoinColumn(name = "album_id")
     private Album album;

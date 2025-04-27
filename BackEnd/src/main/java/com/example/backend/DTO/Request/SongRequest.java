@@ -10,8 +10,8 @@ public class SongRequest {
     private String audioUrl;
     private String duration;
 
+    private String imgUrl;
     private String artistId;
-//    private Long categoryId;
     private String albumId;
 
 //    private List<LyricLineRequest> lyrics;
