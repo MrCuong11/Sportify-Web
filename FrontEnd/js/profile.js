@@ -3,19 +3,22 @@ document.addEventListener("DOMContentLoaded", function () {
   const token = getCookie("authToken");
   const authSection = document.getElementById("authSection");
   const loginRegister = document.getElementById("loginRegister");
-
-  if (token) {
-    authSection.style.display = "block";
-    loginRegister.style.display = "none";
-
-    const username = getUsernameFromToken(token);
-    if (username) {
-      setDefaultProfileAvatar(username);
+  
+  if (authSection && loginRegister) {
+    if (token) {
+      authSection.style.display = "block";
+      loginRegister.style.display = "none";
+  
+      const username = getUsernameFromToken(token);
+      if (username) {
+        setDefaultProfileAvatar(username);
+      }
+    } else {
+      authSection.style.display = "none";
+      loginRegister.style.display = "block";
     }
-  } else {
-    authSection.style.display = "none";
-    loginRegister.style.display = "block";
   }
+  
 });
 
 function getCookie(name) {

@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const artistEl = document.querySelector(".playingSong__title-singer");
     const imageEl = document.getElementById("footer-song-image");
 
+    const token = getCookie('authToken');  // Lấy authToken từ cookie
+
+
 
     if (!token) {
         // Disable seekbar
@@ -100,25 +103,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let playlist = [];
 
-fetch('./data/songs.json')
-  .then(response => response.json())
-  .then(data => {
-      playlist = data;
-      loadSong(currentSongIndex);
-      renderQueue();
-      renderLatestReleases();
-  })
-  .catch(error => console.error("Error loading playlist:", error));
+    
+    fetch('http://localhost:8080/songs', {
+      headers: {
+        'Authorization': `Bearer ${token}`,   // Gửi token trong header
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Dữ liệu trả về từ API:", data);
+          playlist = data.result.content;;
+        //   loadSong(currentSongIndex);
+          renderQueue();
+          renderLatestReleases();
+      })
+      .catch(error => console.error("Error loading playlist:", error));
+    
+    
 
-    function loadSong(index) {
-        const song = playlist[index];
-        audio.src = song.src;
-        titleEl.textContent = song.name;
-        artistEl.textContent = song.artist;
-        imageEl.style.backgroundImage = `url('${song.image}')`;
-        imageEl.style.backgroundSize = "cover";
-        imageEl.style.backgroundPosition = "center";
+      function loadSongById(songId) {
+        fetch(`http://localhost:8080/songs/${songId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())  // Chuyển đổi thành JSON
+        .then(song => {
+            console.log('Song Data:', song);
+            if (song && song.code === 1000) {
+                const songData = song.result;  // <- Đây là dữ liệu bài hát thực sự
+                audio.src = songData.audioUrl;
+                titleEl.textContent = songData.title;
+                artistEl.textContent = songData.artistName;
+                imageEl.style.backgroundImage = `url('${songData.image}')`; // Nếu có image, nếu không có thì kiểm tra thêm
+                imageEl.style.backgroundSize = "cover";
+                imageEl.style.backgroundPosition = "center";
+                playSong();
+            } else {
+                console.error('Invalid song data');
+            }
+        })        
+        .catch(error => console.error("Error loading song details:", error));
+        
     }
+    
+    function loadSongByIndex(index) {
+        const song = playlist[index];
+        if (!song) return;
+        loadSongById(song.id);
+    }
+    
+
 
     function playSong() {
         audio.play();
@@ -144,7 +186,7 @@ fetch('./data/songs.json')
         } else {
             currentSongIndex = (currentSongIndex + 1) % playlist.length;
         }
-        loadSong(currentSongIndex);
+        loadSongByIndex(currentSongIndex);
         playSong();
     }
 
@@ -158,7 +200,7 @@ fetch('./data/songs.json')
         } else {
             currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
         }
-        loadSong(currentSongIndex);
+        loadSongByIndex(currentSongIndex);
         playSong();
     }
 
@@ -205,12 +247,45 @@ fetch('./data/songs.json')
         }
     });
 
-    function formatTime(seconds) {
-        const min = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${min}:${sec < 10 ? "0" + sec : sec}`;
-    };
 
+    // function renderQueue() {
+    //     queueContainer.innerHTML = ""; // Xoá danh sách cũ
+
+    //     playlist.forEach((song, index) => {
+    //         const queueElement = document.createElement("div");
+    //         queueElement.classList.add("queue-element");
+
+    //         if (index === currentSongIndex) {
+    //             queueElement.classList.add("currently-playing");
+    //         }
+
+    //         queueElement.innerHTML = `
+    //             <div class="song-image-container">
+    //                 <p class="queue-number">${(index + 1).toString().padStart(2, '0')}</p>
+    //                 <div class="image-container">
+    //                     <img class="queue-song-img" src="${song.image}" />
+    //                     <i class="fas play-btn fa-play"></i>
+    //                 </div>
+    //                 <div class="song-and-artist-container">
+    //                     <p class="queue-song-name">${song.title}</p>
+    //                     <p class="queue-artist-name">${song.artistName}</p>
+    //                 </div>
+    //             </div>
+    //             <span class="nav-link">
+    //                 <button><i class="far wishlist-icon fa-heart"></i></button>
+    //             </span>
+    //         `;
+
+    //         queueElement.addEventListener("click", () => {
+    //             currentSongIndex = index;
+    //             loadSong(currentSongIndex);
+    //             playSong();
+    //             renderQueue(); // Cập nhật lại highlight
+    //         });
+
+    //         queueContainer.appendChild(queueElement);
+    //     });
+    // }
 
     function renderQueue() {
         queueContainer.innerHTML = ""; // Xoá danh sách cũ
@@ -218,10 +293,6 @@ fetch('./data/songs.json')
         playlist.forEach((song, index) => {
             const queueElement = document.createElement("div");
             queueElement.classList.add("queue-element");
-
-            if (index === currentSongIndex) {
-                queueElement.classList.add("currently-playing");
-            }
 
             queueElement.innerHTML = `
                 <div class="song-image-container">
@@ -231,8 +302,8 @@ fetch('./data/songs.json')
                         <i class="fas play-btn fa-play"></i>
                     </div>
                     <div class="song-and-artist-container">
-                        <p class="queue-song-name">${song.name}</p>
-                        <p class="queue-artist-name">${song.artist}</p>
+                        <p class="queue-song-name">${song.title}</p>
+                        <p class="queue-artist-name">${song.artistName}</p>
                     </div>
                 </div>
                 <span class="nav-link">
@@ -241,10 +312,8 @@ fetch('./data/songs.json')
             `;
 
             queueElement.addEventListener("click", () => {
-                currentSongIndex = index;
-                loadSong(currentSongIndex);
-                playSong();
-                renderQueue(); // Cập nhật lại highlight
+                loadSongById(song.id);  // Gọi API songs/{id} khi click vào bài hát
+                renderQueue(); // Cập nhật lại highlight bài hát đang phát
             });
 
             queueContainer.appendChild(queueElement);
@@ -259,10 +328,10 @@ fetch('./data/songs.json')
             if (!song) return;
     
             const nameElement = card.querySelector(".song-name");
-            if (nameElement) nameElement.textContent = song.name;
+            if (nameElement) nameElement.textContent = song.title;
     
             const artistElement = card.querySelector(".date");
-            if (artistElement) artistElement.textContent = song.artist;
+            if (artistElement) artistElement.textContent = song.artistName;
     
             const imgContainer = card.querySelector(".latest-release-img-container");
             if (imgContainer) {
@@ -270,18 +339,21 @@ fetch('./data/songs.json')
                 imgContainer.style.backgroundSize = 'cover';
                 imgContainer.style.backgroundPosition = 'center';
             }
-    
-            const audio = new Audio(song.src);
-            audio.addEventListener("loadedmetadata", () => {
-                const durationElement = card.querySelector(".time");
-                if (durationElement) {
-                    durationElement.textContent = formatTime(audio.duration);
-                }
-            });
+
+            const durationElement = card.querySelector(".time");
+            durationElement.textContent = song.duration;
+            
+            // const audio = new Audio(song.src);
+            // audio.addEventListener("loadedmetadata", () => {
+            //     const durationElement = card.querySelector(".time");
+            //     if (durationElement) {
+            //         durationElement.textContent = formatTime(audio.duration);
+            //     }
+            // });
     
             card.addEventListener("click", () => {
                 currentSongIndex = index;
-                loadSong(currentSongIndex);
+                loadSongByIndex(currentSongIndex);
                 playSong();
                 renderQueue();
             });
@@ -289,66 +361,11 @@ fetch('./data/songs.json')
     }
     
 
-    // // Latest Release
-    // const cards = document.querySelectorAll(".latest-release-card");
-
-    // cards.forEach((card, index) => {
-    //     const song = playlist[index];
-    //     if (!song) return; // Tránh lỗi nếu số card > số bài hát
-
-    //     // Set tên bài hát
-    //     const nameElement = card.querySelector(".song-name");
-    //     if (nameElement) nameElement.textContent = song.name;
-
-    //     // Set nghệ sĩ
-    //     const artistElement = card.querySelector(".date");
-    //     if (artistElement) artistElement.textContent = song.artist;
-
-    //     // Set ảnh nền cho khung ảnh
-    //     const imgContainer = card.querySelector(".latest-release-img-container");
-    //     if (imgContainer) {
-    //         imgContainer.style.backgroundImage = `url('${song.image}')`;
-    //         imgContainer.style.backgroundSize = 'cover';
-    //         imgContainer.style.backgroundPosition = 'center';
-    //     }
-
-    //     const audio = new Audio(song.src);
-    //     audio.addEventListener("loadedmetadata", () => {
-    //         const durationElement = card.querySelector(".time");
-    //         if (durationElement) {
-    //             durationElement.textContent = formatTime(audio.duration);
-    //         }
-    //     });
-
-    //     card.addEventListener("click", () => {
-    //         currentSongIndex = index;
-    //         loadSong(currentSongIndex);
-    //         playSong();
-    //         renderQueue();
-    //     });
-
-        
-    // });
-
-   
-
-  
-
 function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' + secs : secs}`;
 }
-
-
-
-    
-
-
-   
-
-
-   
 
     let lyricsData = []; // Mảng chứa dữ liệu lời bài hát
 

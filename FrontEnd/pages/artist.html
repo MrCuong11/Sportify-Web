@@ -13,7 +13,7 @@
     <meta name="twitter:description" content="Ninja Studio's Music Player is a modern, classic and easy to use Web Music Player with interactive UI" />
     <meta
       name="twitter:image"
-      content="/logo.png"
+      content="./logo.png"
     />
 
     <meta charset="UTF-8">
@@ -33,7 +33,7 @@
     <div class="main-container">
          <header class="header">
             <div class="logo">
-                <img src="logo.png" />
+                <img src="../logo.png" />
                 <a href="./index2.html" class="fav">Favourites</a>
             </div>
             <div class="searchbox-container">
@@ -45,7 +45,7 @@
                 <i class="fas bell fa-bell"></i>
                 <div class="profile-container">
                      <!-- Avatar mặc định là chữ cái đầu -->
-                     <div class="profile-avatar" id="profileAvatar" onclick="toggleDropdown()"></div> -->
+                     <div class="profile-avatar" id="profileAvatar" onclick="toggleDropdown()"></div>
                   
                     <!-- Dropdown menu -->
                      <div class="dropdown-menu" id="profileDropdown">
@@ -63,16 +63,16 @@
 
         <section class="artist-hero">
             <div class="artist-banner">
-                <img src="../assets/images/id.jpg" alt="Artist Banner">
+                <img id="artistBanner" src="../assets/images/id.jpg" alt="Artist Banner">
             </div>
             <div class="artist-details-container">
                 <div class="artist-avatar">
-                    <img src="../assets/images/bandoi.jpg" alt="Artist Avatar">
+                    <img id="artistAvatar" src="../assets/images/bandoi.jpg" alt="Artist Avatar">
                 </div>
                 <div class="artist-text">
                     <p class="artist-type">Nghệ sĩ</p>
                     <h1 class="artist-name" id="artistName">Vũ.</h1>
-                    <p class="monthly-listeners">10.000.000 người nghe hàng tháng</p>
+                    <p class="monthly-listeners" id="monthlyListeners">10,000 người nghe hàng tháng</p>
                 </div>
             </div>
             <div class="artist-actions">
@@ -121,7 +121,7 @@
             </ul>
         </section>
 
-        <!-- <section class="related-artists">
+        <section class="related-artists">
             <h2>Fans also like</h2>
             <div class="artist-list">
               <div class="artist-item">
@@ -137,7 +137,7 @@
                 <span>Ngọt</span>
               </div>
             </div>
-          </section> -->
+          </section>
         
         
         
@@ -215,9 +215,10 @@
               
        
     </div>
-    <script src="./js/playMusic.js"></script>
-    <script src="./js/profile.js"></script>
-    <script src="./js/home.js"></script>
+    <script src="../js/playMusic.js"></script>
+    <script src="../js/profile.js"></script>
+    <script src="../js/artist.js"></script>
+
 </body>
 
 </html>
