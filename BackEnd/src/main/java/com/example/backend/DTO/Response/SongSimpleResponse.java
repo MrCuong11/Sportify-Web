@@ -7,5 +7,6 @@ public class SongSimpleResponse {
     private String id;
     private String title;
     private String duration;
+    private String imgUrl;
     private String artistName;
 }
