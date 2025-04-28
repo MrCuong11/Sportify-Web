@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 audio.src = songData.audioUrl;
                 titleEl.textContent = songData.title;
                 artistEl.textContent = songData.artistName;
-                imageEl.style.backgroundImage = `url('${songData.image}')`; // Nếu có image, nếu không có thì kiểm tra thêm
+                imageEl.style.backgroundImage = `url('${songData.imgUrl}')`; // Nếu có image, nếu không có thì kiểm tra thêm
                 imageEl.style.backgroundSize = "cover";
                 imageEl.style.backgroundPosition = "center";
                 playSong();
@@ -298,7 +298,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="song-image-container">
                     <p class="queue-number">${(index + 1).toString().padStart(2, '0')}</p>
                     <div class="image-container">
-                        <img class="queue-song-img" src="${song.image}" />
+                        <img class="queue-song-img" src="${song.imgUrl}" />
                         <i class="fas play-btn fa-play"></i>
                     </div>
                     <div class="song-and-artist-container">
@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
             const imgContainer = card.querySelector(".latest-release-img-container");
             if (imgContainer) {
-                imgContainer.style.backgroundImage = `url('${song.image}')`;
+                imgContainer.style.backgroundImage = `url('${song.imgUrl}')`;
                 imgContainer.style.backgroundSize = 'cover';
                 imgContainer.style.backgroundPosition = 'center';
             }
