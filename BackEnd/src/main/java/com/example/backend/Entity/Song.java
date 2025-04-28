@@ -39,6 +39,8 @@ public class Song {
     @JoinColumn(name = "album_id")
     private Album album;
 
+    //manyToOne (have saw directly in song table)
+
     @OneToMany(mappedBy = "song")
     private List<ListeningHistory> listeningHistories;
 
@@ -48,7 +50,9 @@ public class Song {
     @OneToMany(mappedBy = "song")
     private List<PlaylistSong> playlistSongs;
 
-    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<LyricLine> lyricLines = new ArrayList<>();
+//    oneToMany (didn't see directly in song table)
+
 }
 
