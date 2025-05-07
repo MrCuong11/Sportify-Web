@@ -1,5 +1,7 @@
 package com.example.backend.Entity;
 
+import com.example.backend.Enums.AlbumStatus;
+import com.example.backend.Enums.PlaylistStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,5 +37,7 @@ public class Playlist {
 
     @OneToMany(mappedBy = "playlist")
     private List<PlaylistSong> playlistSongs;
+    @Enumerated(EnumType.STRING)
+    private PlaylistStatus status = PlaylistStatus.ACTIVE;  // Mặc định là ACTIVE
 }
 
