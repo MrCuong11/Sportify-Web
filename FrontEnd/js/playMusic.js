@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     
 
-      function loadSongById(songId) {
+  function loadSongById(songId) {
         fetch(`http://localhost:8080/songs/${songId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -466,10 +466,78 @@ expandLyricsBtn.addEventListener("click", () => {
 
 });
 
-    
+async function loadNonVietnameseSongs() {
+    try {
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+  
+      // 1. Gọi API lấy tất cả bài hát và quốc gia
+      const [songsRes, countriesRes] = await Promise.all([
+        fetch('http://localhost:8080/songs?page=0&size=50', { headers }),
+        fetch('http://localhost:8080/countries', { headers })
+      ]);
+  
+      const [songsData, countriesData] = await Promise.all([
+        songsRes.json(),
+        countriesRes.json()
+      ]);
+  
+      const songList = songsData.result.content;
+      const countryList = countriesData.result;
+  
+      // 2. Tìm ID Việt Nam
+      const vietnamCountry = countryList.find(country => country.code === 'viet-nam');
+      const vietnamCountryId = vietnamCountry?.id;
+  
+      if (!vietnamCountryId) {
+        console.error("Không tìm thấy quốc gia Việt Nam!");
+        return;
+      }
+  
+      // 3. Gọi API lấy danh sách nghệ sĩ Việt Nam
+      const vietnamArtistsRes = await fetch(`http://localhost:8080/countries/${vietnamCountryId}/with-artists`, { headers });
+      const vietnamArtistsData = await vietnamArtistsRes.json();
+      const vietnameseArtistList = vietnamArtistsData.result.artists;
+  
+      const vietnameseArtistNames = vietnameseArtistList.map(artist => artist.name);
+  
+      // 4. Lọc ra bài hát KHÔNG thuộc nghệ sĩ Việt Nam
+      const nonVietnameseSongs = songList.filter(song => !vietnameseArtistNames.includes(song.artistName));
+  
+      console.log('nonVietnameseSongs:', nonVietnameseSongs);
+  
+      // 5. Render ra HTML
+      const latestEnglishContent = document.getElementById('latest-english-content');
+      latestEnglishContent.innerHTML = '';
+  
+      // ✨ Chỉ lấy tối đa 6 bài ✨
+      const limitedSongs = nonVietnameseSongs.slice(0, 6);
+  
+      limitedSongs.forEach(song => {
+        const card = document.createElement('div');
+        card.className = 'latest-english-card-container';
+        card.innerHTML = `
+          <img src="${song.imgUrl}" alt="${song.title}" />
+          <p>${song.title}</p>
+        `;
 
 
-    
-    
+        card.addEventListener('click', () => {
+          loadSongById(song.id); // <-- Gọi hàm loadSong với id bài hát
+        });
+
+        latestEnglishContent.appendChild(card);
+      });
+  
+    } catch (error) {
+      console.error('Lỗi khi load bài hát:', error);
+    }
+  }
+  
+  loadNonVietnameseSongs();
+
+
     
 });

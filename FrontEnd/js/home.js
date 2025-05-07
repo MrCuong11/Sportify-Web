@@ -1,5 +1,6 @@
 // const token = getCookie('authToken');  // Lấy authToken từ cookie
 
+
 fetch('http://localhost:8080/artists', { 
   headers: {
     'Authorization': `Bearer ${token}`,  // Nếu API yêu cầu token
@@ -42,3 +43,8 @@ fetch('http://localhost:8080/artists', {
   .catch(error => {
     console.error('Lỗi khi tải dữ liệu nghệ sĩ:', error);
   });
+
+  
+  
+  
+  

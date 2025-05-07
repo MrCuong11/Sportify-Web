@@ -65,7 +65,7 @@ async function verifyLoginCredentials(id, password) {
 // A function that displays the login successful text and redirects the user to the homepage
 function displayLogin(id) {
     document.querySelector(".containerLogin").style.display = "none";
-    document.querySelector("#loginAlertText").innerHTML = `Rebonjour, ${id}!`;
+    
     // Change the successful login alert text
     document.querySelector(".successfulLogin").style.display = "block"; // Make the alert text visible
     document.querySelector(".successfulLogin").style.animation = "popUp linear 5s forwards"; // Animation
