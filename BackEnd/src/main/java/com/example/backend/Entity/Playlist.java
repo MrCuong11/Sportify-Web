@@ -25,6 +25,8 @@ public class Playlist {
 
     private String name;
     private boolean isPublic;
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    private String image_url;
     private LocalDateTime createdAt;
 
     @ManyToOne
