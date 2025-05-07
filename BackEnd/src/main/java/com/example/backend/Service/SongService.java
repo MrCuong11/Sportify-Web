@@ -36,7 +36,6 @@ public class SongService {
 
         song.setArtist(artist);
         song.setAlbum(album);
-        // Save and return response
         Song saved = songRepository.save(song);
         return songMapper.toResponse(saved);
     }
