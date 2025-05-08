@@ -3,6 +3,7 @@ package com.example.backend.Controller;
 import com.example.backend.DTO.Request.AddSongToPlaylistRequest;
 import com.example.backend.DTO.Request.ApiResponse;
 import com.example.backend.DTO.Request.CreatePlaylistRequest;
+import com.example.backend.DTO.Request.UpdatePlaylistRequest;
 import com.example.backend.DTO.Response.PlaylistResponse;
 import com.example.backend.DTO.Response.PlaylistSongResponse;
 import com.example.backend.Service.PlaylistService;
@@ -83,6 +84,30 @@ public class PlaylistController {
         playlistService.archivePlaylist(id);
         return ApiResponse.<String>builder()
                 .result("Playlist has been archived")
+                .build();
+    }
+
+    // Update playlist info
+    @PutMapping("/{id}")
+    public ApiResponse<PlaylistResponse> updatePlaylist(
+            @PathVariable String id,
+            @RequestBody UpdatePlaylistRequest request) {
+
+        PlaylistResponse updated = playlistService.updatePlaylist(id, request);
+        return ApiResponse.<PlaylistResponse>builder()
+                .result(updated)
+                .build();
+    }
+
+    // Reorder songs in a playlist
+    @PutMapping("/{id}/reorder")
+    public ApiResponse<?> reorderPlaylistSongs(
+            @PathVariable String id,
+            @RequestBody List<String> songIdsInOrder) {
+
+        playlistService.reorderPlaylistSongs(id, songIdsInOrder);
+        return ApiResponse.builder()
+                .message("Playlist reordered successfully")
                 .build();
     }
 
