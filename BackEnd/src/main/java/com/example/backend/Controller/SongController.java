@@ -38,11 +38,13 @@ public class SongController {
 
     // Get song by ID
     @GetMapping("/{id}")
-    public ApiResponse<SongResponse> getSongById(@PathVariable String id) {
+    public ApiResponse<SongResponse> getSongById(@PathVariable String id,
+                                                 @RequestParam String userId) {
         return ApiResponse.<SongResponse>builder()
-                .result(songService.getSongById(id))
+                .result(songService.getSongById(id, userId))
                 .build();
     }
+
 
     // Delete song by ID
     @DeleteMapping("/{id}")
