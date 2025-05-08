@@ -15,7 +15,7 @@ spring:
         host: smtp.gmail.com
         port: 587
         username: spotifymailer2025@gmail.com
-        password: kksuubskgsomxivy
+        password: ssbmidzowtsjbgcy
         protocol: smtp
         properties:
             mail:
