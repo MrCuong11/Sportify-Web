@@ -4,6 +4,7 @@ import com.example.backend.Entity.PasswordResetToken;
 import com.example.backend.Entity.User;
 import com.example.backend.Repository.PasswordResetTokenRepository;
 import com.example.backend.Repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class PasswordService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Transactional
     public void sendResetPasswordToken(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
@@ -51,6 +53,7 @@ public class PasswordService {
     }
 
 
+    @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("INVALID_TOKEN"));
@@ -63,6 +66,6 @@ public class PasswordService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        tokenRepository.delete(resetToken); // Invalidate token
+        tokenRepository.delete(resetToken);
     }
 }
