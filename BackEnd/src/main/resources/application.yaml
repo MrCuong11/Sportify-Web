@@ -11,6 +11,21 @@ spring:
     jpa:
         hibernate:
             ddl-auto: update
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: spotifymailer2025@gmail.com
+        password: kksuubskgsomxivy
+        protocol: smtp
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
+                    connectiontimeout: 5000
+                    timeout: 5000
+                    writetimeout: 5000
 
 jwt:
     signerKey: "1t0gBYXKEMfj7YBSokSHymnat7CMQBB0gwhw7PnaGWbfHIZdwZ9oTKR2gk7otZWY"
