@@ -14,9 +14,23 @@
     <!-- linking the css file -->
     <link rel="stylesheet" href="assets/css/style.css">
 
+    <style>
+        .playlist-header{
+            display: flex;
+            justify-content: space-between;
+            justify-items: center;
+            align-items: center;
+        }
+
+        .playlist-header >a{
+            
+        }
+    </style>
+
 
     <!-- use the below to use font-awesome icons -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 </head>
 
 <body>
@@ -440,12 +454,13 @@
                     </div>
                 </div>
                 <!-- Latest English Container -->
-                <div class="latest-english-container">
-                    <div class="latest-english-header">
-                        <p>Latest Hindi</p>
+                <div class="latest-english-container your-playlist">
+                    <div  class="latest-english-header playlist-header">
+                        <p>Your Playlist</p>
+                        <a href="./pages/playlist.html" class="view-all-btn"> Xem tất cả</a>
                     </div>
 
-                    <div class="latest-english-content">
+                    <div class="latest-english-content playlist-showcase-content">
                         <div class="latest-english-card-container">
                             <img src="songs/queue-04.jpg" />
                             <p>Onism</p>

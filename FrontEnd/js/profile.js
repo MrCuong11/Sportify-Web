@@ -33,7 +33,7 @@ function eraseCookie(name) {
 }
 
 function redirectToLogin() {
-  window.location.href = "../FrontEnd/pages/login.html"; // hoặc bất kỳ trang login nào bạn đang dùng
+  window.location.href = "/FrontEnd/pages/login.html"; // hoặc bất kỳ trang login nào bạn đang dùng
 }
 
 async function handleLogout() {

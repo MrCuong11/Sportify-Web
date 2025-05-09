@@ -1025,10 +1025,14 @@ input[type=radio] {
 
 .latest-english-container {
     width: 100%;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+}
+
+.your-playlist{
+    margin-bottom: 4rem;
 }
 
 .latest-english-header {
@@ -1048,6 +1052,7 @@ input[type=radio] {
     align-items: flex-start;
     margin-bottom: 0.7rem;
     cursor: pointer;
+    
 }
 
 .latest-english-card-container {
@@ -1059,12 +1064,30 @@ input[type=radio] {
 }
 
 .latest-english-card-container img {
-    width: 100%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
 }
 
 .latest-english-card-container p {
     color: #FFFEFE;
     font-size: 0.7rem;
+    /* text-align: center; */
+}
+
+.view-all-btn {
+  display: inline-block;
+  padding: 6px 14px;
+  background-color: #31185f;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.view-all-btn:hover {
+  background-color: #7eb492;
 }
 
 /* lyric */
