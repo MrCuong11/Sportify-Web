@@ -82,16 +82,14 @@ public class LyricLineController {
                 }
             }
 
-            // Lưu tất cả lyric lines vào database
             lyricLineService.saveAll(lyricLines);
 
-            // Chuyển entity sang DTO
             List<LyricLineDto> lyricLineDtos = lyricLines.stream()
                     .map(lines -> new LyricLineDto(lines.getTimestamp(), lines.getText()))
                     .collect(Collectors.toList());
 
             LyricUploadResponse response = new LyricUploadResponse();
-            response.setLyrics(lyricLineDtos); // Dùng DTO thay vì entity
+            response.setLyrics(lyricLineDtos);
             response.setSong(new SongBriefResponse(
                     song.getId(),
                     song.getTitle(),
