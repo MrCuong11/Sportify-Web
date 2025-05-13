@@ -1,14 +1,13 @@
 .playlist-container {
   display: block;
   width: 100%;
-  padding: 0 20px;
+  padding: 0 20px 74px 20px;
   color: white;
 }
 
 .playlist-container h2 {
   font-size: 32px;
   margin-bottom: 20px;
-  
 }
 
 .tab-menu {
@@ -61,7 +60,6 @@
 .playlist-info h3 {
   font-size: 16px;
   margin: 5px 0;
-  
 }
 
 .playlist-info p {
@@ -256,12 +254,11 @@
   color: #b5179e; /* màu tím hover */
 }
 
-.song-list{
+.song-list {
   max-height: 200px; /* hoặc bạn chọn chiều cao phù hợp, ví dụ 400px */
   overflow-y: auto;
   padding-right: 8px;
   margin-bottom: 20px;
-
 }
 
 .song-list::-webkit-scrollbar {
@@ -317,7 +314,8 @@
   margin: 0;
 }
 
-.song-album, .song-duration {
+.song-album,
+.song-duration {
   width: 20%;
   font-size: 14px;
   color: #cccccc;
@@ -344,7 +342,7 @@
 }
 
 .suggestion-list::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
 
@@ -447,14 +445,14 @@
   padding: 6px;
 }
 
-.menu-dropdown-delete{
+.menu-dropdown-delete {
   position: absolute;
   right: 0;
   top: 30px;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -485,8 +483,3 @@
 .delete-playlist-btn:hover {
   background-color: #f9f9f9;
 }
-
-
-
-
-

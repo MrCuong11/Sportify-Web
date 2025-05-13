@@ -7,48 +7,51 @@ const playlistGrid = document.querySelector(".playlist-grid");
 const songSearchInput = document.getElementById("song-search");
 const suggestedList = document.querySelector(".suggestion-list");
 
-document.addEventListener('DOMContentLoaded', () => {
-  const menuBtn = document.querySelector('.menu-btn');
-  const dropdownDelete = document.querySelector('.menu-dropdown-delete');
-  const deleteBtnImg = document.querySelector('.delete-playlist-btn');
+document.addEventListener("DOMContentLoaded", () => {
+  const menuBtn = document.querySelector(".menu-btn");
+  const dropdownDelete = document.querySelector(".menu-dropdown-delete");
+  const deleteBtnImg = document.querySelector(".delete-playlist-btn");
 
-  menuBtn.addEventListener('click', (e) => {
+  menuBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    dropdownDelete.style.display = dropdownDelete.style.display === 'block' ? 'none' : 'block';
+    dropdownDelete.style.display =
+      dropdownDelete.style.display === "block" ? "none" : "block";
   });
 
-  document.addEventListener('click', () => {
-    dropdownDelete.style.display = 'none';
+  document.addEventListener("click", () => {
+    dropdownDelete.style.display = "none";
   });
 
-  deleteBtnImg.addEventListener('click', () => {
-    const confirmDelete = confirm('Bạn có chắc muốn xóa playlist này không?');
+  deleteBtnImg.addEventListener("click", () => {
+    const confirmDelete = confirm("Bạn có chắc muốn xóa playlist này không?");
     if (!confirmDelete) return;
 
-// bạn thay bằng id thật
+    // bạn thay bằng id thật
 
-    fetch(`http://localhost:8080/playlists/${window.currentPlaylistId}/archive`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+    fetch(
+      `http://localhost:8080/playlists/${window.currentPlaylistId}/archive`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       }
-    })
-    .then(res => {
-      if (res.ok) {
-        alert('Đã xóa playlist thành công!');
-        window.history.back();
-      } else {
-        alert('Xóa không thành công.');
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Có lỗi xảy ra khi xóa.');
-    });
+    )
+      .then((res) => {
+        if (res.ok) {
+          alert("Đã xóa playlist thành công!");
+          window.history.back();
+        } else {
+          alert("Xóa không thành công.");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Có lỗi xảy ra khi xóa.");
+      });
   });
 });
-
 
 function renderPlaylists(playlists) {
   // Xóa hết các item cũ (chừa nút tạo mới)
@@ -58,8 +61,6 @@ function renderPlaylists(playlists) {
   // console.log(playlists);
 
   playlists.forEach((playlist) => {
-     
-
     const item = document.createElement("div");
     item.classList.add("playlist-item");
 
@@ -347,6 +348,54 @@ async function renderSongsInPlaylist(songsInPlaylist) {
       }
     });
 
+    const songInfo = songItem.querySelector(".song-info");
+    songInfo.style.cursor = "pointer";
+    songInfo.addEventListener("click", async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/songs/${fullSong.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) throw new Error("Không thể lấy thông tin bài hát");
+
+        const songDetails = await response.json();
+        const audioUrl = songDetails.result?.audioUrl;
+
+        if (!audioUrl) {
+          alert("Không có file nhạc để phát");
+          return;
+        }
+
+        const audioPlayer = document.getElementById("audio");
+        audioPlayer.src = audioUrl;
+        
+        document.querySelector(".playingSong__title-name").textContent =
+          songDetails.result?.title || "Không rõ tiêu đề";
+
+        document.querySelector(".playingSong__title-singer").textContent =
+          songDetails.result?.artistName || "Không rõ nghệ sĩ";
+
+        const imgDiv = document.getElementById("footer-song-image");
+        if (imgDiv) {
+          imgDiv.style.backgroundImage = `url('${
+            songDetails.result?.imgUrl ||
+            "https://img.icons8.com/ios/50/music.png"
+          }')`;
+          imgDiv.style.backgroundSize = "cover";
+          imgDiv.style.backgroundPosition = "center";
+        }
+        audioPlayer.play();
+      } catch (error) {
+        console.error("Lỗi khi phát nhạc:", error);
+        alert("Lỗi khi phát nhạc");
+      }
+    });
+
     songListContainer.appendChild(songItem);
   });
 }
@@ -440,51 +489,3 @@ async function addSongToPlaylist(songId) {
 
 // Gọi ban đầu để lấy danh sách bài hát
 fetchAllSongs();
-const songItem = document.querySelector("song-row");
-const actionBtn = songItem.querySelector(".action-btn");
-const dropdown = songItem.querySelector(".dropdown-menu-playlist");
-
-actionBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  dropdown.classList.toggle("show");
-});
-
-// Bấm ra ngoài thì ẩn menu
-document.addEventListener("click", () => {
-  dropdown.classList.remove("show");
-});
-
-// Xoá bài hát khỏi playlist
-const deleteBtn = songItem.querySelector(".delete-btn");
-deleteBtn.addEventListener("click", async () => {
-  try {
-    const response = await fetch(
-      "http://localhost:8080/playlists/remove-song",
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          playlistId: window.currentPlaylistId,
-          songIds: [fullSong.id],
-        }),
-      }
-    );
-
-    if (!response.ok) throw new Error("Xoá thất bại");
-
-    alert("Đã xoá bài hát khỏi playlist");
-
-    // Reload lại danh sách bài hát
-    loadPlaylistSongs(window.currentPlaylistId);
-  } catch (err) {
-    console.error(err);
-    alert("Lỗi khi xoá bài hát");
-  }
-});
-
-
-
-

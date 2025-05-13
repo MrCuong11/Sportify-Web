@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let playlist = [];
 
     
-    fetch('http://localhost:8080/songs', {
+     fetch('http://localhost:8080/songs', {
       headers: {
         'Authorization': `Bearer ${token}`,   // Gửi token trong header
         'Content-Type': 'application/json'
@@ -541,3 +541,8 @@ async function loadNonVietnameseSongs() {
 
     
 });
+
+// playlist 
+// Khi click vào bài hát -> hiện thông tin ở footer
+
+
