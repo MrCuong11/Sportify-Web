@@ -1,6 +1,7 @@
 package com.example.backend.Service;
 
 
+import com.example.backend.DTO.Request.ListeningHistoryRequestDTO;
 import com.example.backend.DTO.Request.SongRequest;
 import com.example.backend.DTO.Response.SongResponse;
 import com.example.backend.DTO.Response.SongSimpleResponse;
@@ -23,6 +24,7 @@ public class SongService {
     private final ArtistRepository artistRepository;
     private final AlbumRepository albumRepository;
     private final SongMapper songMapper;
+    private final ListeningHistoryService listeningHistoryService;
 
     public SongResponse createSong(SongRequest request) {
         // Map base fields
@@ -46,20 +48,38 @@ public class SongService {
     }
 
 
-    public SongResponse getSongById(String id) {
+    public SongResponse getSongById(String songId, String userId) {
         // Retrieve the song by ID
-        Song song = songRepository.findById(id)
+        Song song = songRepository.findById(songId)
                 .orElseThrow(() -> new IllegalArgumentException("Song not found"));
 
         // Increment play count
         song.setPlayCount(song.getPlayCount() + 1);
-
-        // Save the updated song
         songRepository.save(song);
 
-        // Return the response (mapped to SongResponse)
+
+        ListeningHistoryRequestDTO historyDTO = new ListeningHistoryRequestDTO();
+        historyDTO.setUserId(userId);
+        historyDTO.setSongId(songId);
+        listeningHistoryService.recordTrack(historyDTO);
+
+        // Return response
         return songMapper.toResponse(song);
     }
+
+    public Page<SongSimpleResponse> getSongsOrderedByPlayCount(Pageable pageable) {
+        return songRepository.findAllByOrderByPlayCountDesc(pageable)
+                .map(songMapper::toSimpleResponse);
+    }
+
+    public List<SongSimpleResponse> getNewSongs() {
+        return songRepository.findTop10ByOrderByCreatedAtDesc()
+                .stream()
+                .map(songMapper::toSimpleResponse)
+                .collect(Collectors.toList());
+    }
+
+
 
 
     public void deleteSong(String id) {

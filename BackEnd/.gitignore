@@ -34,3 +34,4 @@ build/
 
 ## service account ##
 src/main/resources/gcs-credentials.json
+src/main/resources/application.yaml

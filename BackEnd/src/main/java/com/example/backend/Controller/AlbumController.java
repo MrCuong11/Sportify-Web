@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/albums")
 @RequiredArgsConstructor
@@ -69,5 +71,10 @@ public class AlbumController {
         return ApiResponse.<String>builder()
                 .result("Album has been archived")
                 .build();
+    }
+
+    @GetMapping("/new-releases")
+    public List<AlbumBriefResponse> getNewReleases() {
+        return albumService.getNewAlbumReleases();
     }
 }

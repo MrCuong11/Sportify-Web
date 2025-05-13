@@ -2,6 +2,7 @@ package com.example.backend.Service;
 
 import com.example.backend.DTO.Request.AddSongToPlaylistRequest;
 import com.example.backend.DTO.Request.CreatePlaylistRequest;
+import com.example.backend.DTO.Request.UpdatePlaylistRequest;
 import com.example.backend.DTO.Response.PlaylistResponse;
 import com.example.backend.DTO.Response.PlaylistSongResponse;
 import com.example.backend.Entity.Playlist;
@@ -25,7 +26,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -144,10 +147,45 @@ public class PlaylistService {
             playlistSongOpt.ifPresent(playlistSongRepository::delete);
         }
     }
+//    Update Playlist Info
+    @Transactional
+    public PlaylistResponse updatePlaylist(String playlistId, UpdatePlaylistRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow();
 
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RuntimeException("PLAYLIST_NOT_FOUND"));
 
+        if (!playlist.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("UNAUTHORIZED");
+        }
 
+        playlist.setName(request.getName());
+        playlist.setImage_url(request.getImageUrl());
+        playlist.setPublic(request.isPublic());
 
+        return playlistMapper.toResponse(playlistRepository.save(playlist));
+    }
+
+//    reorder playlist
+    @Transactional
+    public void reorderPlaylistSongs(String playlistId, List<String> songIdsInOrder) {
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RuntimeException("PLAYLIST_NOT_FOUND"));
+
+        List<PlaylistSong> playlistSongs = playlistSongRepository.findByPlaylist(playlist);
+
+        Map<String, PlaylistSong> songMap = playlistSongs.stream()
+                .collect(Collectors.toMap(ps -> ps.getSong().getId(), ps -> ps));
+
+        for (int i = 0; i < songIdsInOrder.size(); i++) {
+            PlaylistSong ps = songMap.get(songIdsInOrder.get(i));
+            if (ps != null) {
+                ps.setPosition(i);
+                playlistSongRepository.save(ps);
+            }
+        }
+    }
 
 
 }
