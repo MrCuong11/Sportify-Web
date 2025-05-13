@@ -41,10 +41,9 @@ public class SongController {
 
     // Get song by ID
     @GetMapping("/{id}")
-    public ApiResponse<SongResponse> getSongById(@PathVariable String id,
-                                                 @RequestParam String userId) {
+    public ApiResponse<SongResponse> getSongById(@PathVariable String id) {
         return ApiResponse.<SongResponse>builder()
-                .result(songService.getSongById(id, userId))
+                .result(songService.getSongById(id))
                 .build();
     }
 
