@@ -11,6 +11,7 @@ import com.example.backend.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class SongService {
     private final AlbumRepository albumRepository;
     private final SongMapper songMapper;
     private final ListeningHistoryService listeningHistoryService;
+    private final UserRepository userRepository;
 
     public SongResponse createSong(SongRequest request) {
         // Map base fields
@@ -48,24 +50,34 @@ public class SongService {
     }
 
 
-    public SongResponse getSongById(String songId, String userId) {
-        // Retrieve the song by ID
+    public SongResponse getSongById(String songId) {
+        // Lấy username từ context
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Tìm user từ database
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("USER_NOT_EXISTED"));
+
+        String userId = user.getId();
+
+        // Lấy bài hát từ DB
         Song song = songRepository.findById(songId)
                 .orElseThrow(() -> new IllegalArgumentException("Song not found"));
 
-        // Increment play count
+        // Tăng play count
         song.setPlayCount(song.getPlayCount() + 1);
         songRepository.save(song);
 
-
+        // Ghi lại lịch sử nghe
         ListeningHistoryRequestDTO historyDTO = new ListeningHistoryRequestDTO();
         historyDTO.setUserId(userId);
         historyDTO.setSongId(songId);
         listeningHistoryService.recordTrack(historyDTO);
 
-        // Return response
+        // Trả về response
         return songMapper.toResponse(song);
     }
+
 
     public Page<SongSimpleResponse> getSongsOrderedByPlayCount(Pageable pageable) {
         return songRepository.findAllByOrderByPlayCountDesc(pageable)
