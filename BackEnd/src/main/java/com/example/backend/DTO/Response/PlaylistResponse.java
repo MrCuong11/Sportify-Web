@@ -20,4 +20,5 @@ public class PlaylistResponse {
     private LocalDateTime createdAt;
     private String userId;
     private List<PlaylistSongResponse> songs;
+    private boolean archive;
 }

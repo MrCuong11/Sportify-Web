@@ -67,6 +67,19 @@ public class SongService {
         return songMapper.toResponse(song);
     }
 
+    public Page<SongSimpleResponse> getSongsOrderedByPlayCount(Pageable pageable) {
+        return songRepository.findAllByOrderByPlayCountDesc(pageable)
+                .map(songMapper::toSimpleResponse);
+    }
+
+    public List<SongSimpleResponse> getNewSongs() {
+        return songRepository.findTop10ByOrderByCreatedAtDesc()
+                .stream()
+                .map(songMapper::toSimpleResponse)
+                .collect(Collectors.toList());
+    }
+
+
 
 
     public void deleteSong(String id) {

@@ -9,7 +9,10 @@ import com.example.backend.Service.SongService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/songs")
@@ -54,4 +57,23 @@ public class SongController {
                 .result("Song have been deleted")
                 .build();
     }
+
+
+//    top songs trending
+    @GetMapping("/top")
+    public ApiResponse<Page<SongSimpleResponse>> getTopSongs(Pageable pageable) {
+        Page<SongSimpleResponse> result = songService.getSongsOrderedByPlayCount(pageable);
+        return ApiResponse.<Page<SongSimpleResponse>>builder()
+                .result(result)
+                .build();
+    }
+
+    @GetMapping("/new-releases")
+    public ApiResponse<List<SongSimpleResponse>>  getNewSongReleases() {
+        List<SongSimpleResponse> result = songService.getNewSongs();
+        return ApiResponse.<List<SongSimpleResponse>>builder()
+                .result(result)
+                .build();
+    }
+
 }

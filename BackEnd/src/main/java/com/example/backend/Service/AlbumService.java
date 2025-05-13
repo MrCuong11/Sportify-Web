@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -85,4 +86,17 @@ public class AlbumService {
 
         albumRepository.save(album);  // Lưu album đã cập nhật
     }
+
+    public List<AlbumBriefResponse> getNewAlbumReleases() {
+        return albumRepository.findTop10ByOrderByReleaseDateDesc()
+                .stream()
+                .map(album -> AlbumBriefResponse.builder()
+                        .id(album.getId())
+                        .name(album.getName())
+                        .coverImageUrl(album.getCoverImageUrl())
+                        .releaseDate(album.getReleaseDate())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }

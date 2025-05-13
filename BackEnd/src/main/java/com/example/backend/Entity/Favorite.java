@@ -12,16 +12,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@IdClass(FavoriteId.class)
 public class Favorite {
 
-    @Id
+    @EmbeddedId
+    private FavoriteId id;
+
     @ManyToOne
+    @MapsId("user")  // Maps the embedded ID to user
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Id
     @ManyToOne
+    @MapsId("song")  // Maps the embedded ID to song
     @JoinColumn(name = "song_id")
     private Song song;
 }
+
