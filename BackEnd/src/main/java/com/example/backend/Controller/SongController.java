@@ -2,7 +2,6 @@ package com.example.backend.Controller;
 
 import com.example.backend.DTO.Request.ApiResponse;
 import com.example.backend.DTO.Request.SongRequest;
-import com.example.backend.DTO.Response.ArtistResponse;
 import com.example.backend.DTO.Response.SongResponse;
 import com.example.backend.DTO.Response.SongSimpleResponse;
 import com.example.backend.Service.SongService;
@@ -10,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,12 +22,26 @@ public class SongController {
 
     private final SongService songService;
 
-    @PostMapping
-    public ApiResponse<SongResponse> createSong(@RequestBody SongRequest request) {
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<SongResponse> createSong(@ModelAttribute SongRequest request) {
         return ApiResponse.<SongResponse>builder()
                 .result(songService.createSong(request))
                 .build();
     }
+
+//    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ApiResponse<SongResponse> createSong(
+//            @ModelAttribute SongRequest request,  // Các trường khác
+//            @RequestPart("file") MultipartFile file  // Tệp
+//    ) {
+//        // Gán tệp vào SongRequest trước khi truyền cho service
+//        request.setFile(file);
+//        return ApiResponse.<SongResponse>builder()
+//                .result(songService.createSong(request))
+//                .build();
+//    }
+
+
 
     // Get all songs (pagination)
     @GetMapping

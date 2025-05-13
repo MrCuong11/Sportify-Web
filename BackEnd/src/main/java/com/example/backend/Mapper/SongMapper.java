@@ -19,7 +19,7 @@ public interface SongMapper {
     @Mapping(target = "playCount", constant = "0L")
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "artist", ignore = true)
-//    @Mapping(target = "imgUrl", source = "imgUrl")
+    @Mapping(target = "audioUrl", ignore = true) // audioUrl sẽ được set bằng tay
     @Mapping(target = "album", ignore = true)
     @Mapping(target = "lyricLines", ignore = true)
     Song toEntity(SongRequest request);
