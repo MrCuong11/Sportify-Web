@@ -26,6 +26,10 @@ spring:
                     connectiontimeout: 5000
                     timeout: 5000
                     writetimeout: 5000
+    servlet:
+        multipart:
+            max-file-size: 100MB
+            max-request-size: 100MB
 
 jwt:
     signerKey: "1t0gBYXKEMfj7YBSokSHymnat7CMQBB0gwhw7PnaGWbfHIZdwZ9oTKR2gk7otZWY"

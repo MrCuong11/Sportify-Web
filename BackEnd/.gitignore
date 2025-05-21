@@ -33,5 +33,5 @@ build/
 .vscode/
 
 ## service account ##
-src/main/resources/gcs-credentials.json
+src/main/resources/gcs-key.json
 src/main/resources/application.yaml

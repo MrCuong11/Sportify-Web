@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,12 +28,11 @@ public class SongService {
     private final SongMapper songMapper;
     private final ListeningHistoryService listeningHistoryService;
     private final UserRepository userRepository;
+    private final GcsService gcsService;
 
     public SongResponse createSong(SongRequest request) {
-        // Map base fields
         Song song = songMapper.toEntity(request);
 
-        // Set related entities using IDs
         Artist artist = artistRepository.findById(request.getArtistId())
                 .orElseThrow(() -> new IllegalArgumentException("Artist not found"));
         Album album = albumRepository.findById(request.getAlbumId())
@@ -40,6 +40,14 @@ public class SongService {
 
         song.setArtist(artist);
         song.setAlbum(album);
+
+        try {
+            String audioUrl = gcsService.uploadFile(request.getFile());
+            song.setAudioUrl(audioUrl);
+        } catch (IOException e) {
+            throw new RuntimeException("Upload audio failed", e);
+        }
+
         Song saved = songRepository.save(song);
         return songMapper.toResponse(saved);
     }
