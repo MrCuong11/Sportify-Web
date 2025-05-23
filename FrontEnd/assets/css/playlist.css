@@ -287,6 +287,7 @@
   align-items: center;
   flex: 1;
   gap: 12px;
+  /* justify-content: space-between; */
 }
 
 .song-info img {
@@ -332,7 +333,7 @@
   border: 1px solid #333;
   border-radius: 4px;
   width: 100%;
-  max-height: 150px;
+  max-height: 100px;
   overflow-y: auto;
   z-index: 1000;
 }

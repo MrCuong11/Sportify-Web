@@ -1,33 +1,47 @@
-// const token = getCookie('authToken');  // Lấy authToken từ cookie
-fetch("http://localhost:8080/artists", {
-  headers: {
-    Authorization: `Bearer ${token}`, // Nếu API yêu cầu token
-    "Content-Type": "application/json",
-  },
-})
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then((data) => {
-    console.log(data);
+ import { playerController } from './playMusic.js'; // import đúng hàm
+
+let playlist = [];
+let currentSongIndex = 0; // khai báo biến index hiện tại
+
+export function init() {
+  loadShowcasePlaylists();
+  loadNonVietnameseSongs();
+  loadArtists();
+  loadAllSongs();
+  playerController.initPlayer();
+}
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  if (match) return match[2];
+  return null;
+}
+
+async function loadArtists() {
+  const token = getCookie('authToken');
+  try {
+    const res = await fetch("http://localhost:8080/artists", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+    const data = await res.json();
     const container = document.getElementById("artist-list");
+    if (!container) return;
 
-    // Giả sử data.result.content chứa danh sách nghệ sĩ
-    const artists = data.result.content;
+    container.innerHTML = ""; // Xoá nếu có nội dung cũ
 
-    // Chỉ lấy 5 nghệ sĩ đầu tiên
-    const limitedArtists = artists.slice(0, 5);
-
-    limitedArtists.forEach((artist) => {
+    const artists = data.result.content.slice(0, 5);
+    artists.forEach((artist) => {
       const artistHTML = `
         <div class="popular-artists-1-container">
           <div class="popular-artists-img1-container">
             <div class="popular-artists-img-wrapper">
               <img src="${artist.imageUrl}" alt="${artist.name}">
-              <a href="./pages/artist.html?id=${artist.id}">
+              <a href="#/artist?id=${artist.id}">
                 <i class="fas popular-artists-play-btn fa-play"></i>
               </a>
             </div>
@@ -37,46 +51,42 @@ fetch("http://localhost:8080/artists", {
       `;
       container.innerHTML += artistHTML;
     });
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error("Lỗi khi tải dữ liệu nghệ sĩ:", error);
-  });
+  }
+}
 
 async function loadShowcasePlaylists() {
-  const container = document.querySelector(".playlist-showcase-content"); // Class mới để JS gọi
-  container.innerHTML = ""; // Xoá cũ
+  const container = document.querySelector(".playlist-showcase-content");
+  if (!container) return;
+  container.innerHTML = "";
 
   try {
-    const response = await fetch("http://localhost:8080/playlists", {
+    const token = getCookie('authToken');
+    const res = await fetch("http://localhost:8080/playlists", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+    if (!res.ok) throw new Error(`Lỗi: ${res.status}`);
 
-    if (!response.ok) throw new Error(`Lỗi: ${response.status}`);
+    const data = await res.json();
 
-    const data = await response.json();
-    const playlists = data.result.content;
+    // Lọc playlist không bị archive
+    const playlists = data.result.content
+      .filter(pl => !pl.archive)
+      .slice(0, 6);
 
-    // Lấy 6 playlist mới nhất
-    const latest6 = playlists.slice(0, 5);
-
-    latest6.forEach((playlist) => {
+    playlists.forEach((playlist) => {
       const card = document.createElement("div");
-      card.classList.add("latest-english-card-container"); // Giữ nguyên class cũ cho CSS
-
+      card.classList.add("latest-english-card-container");
       card.innerHTML = `
-        <img src="${
-          playlist.image_url || "https://img.icons8.com/ios/100/music.png"
-        }" alt="cover">
+        <img src="${playlist.image_url || "https://img.icons8.com/ios/100/music.png"}" alt="cover">
         <p>${playlist.name}</p>
-        
       `;
-
       card.addEventListener("click", () => {
         console.log("Click playlist", playlist);
       });
-
       container.appendChild(card);
     });
   } catch (error) {
@@ -85,5 +95,166 @@ async function loadShowcasePlaylists() {
 }
 
 
+async function loadNonVietnameseSongs() {
+  const token = getCookie('authToken');
+  if (!token) {
+    console.warn("Chưa đăng nhập, không thể tải bài hát nước ngoài");
+    return;
+  }
 
-document.addEventListener("DOMContentLoaded", loadShowcasePlaylists);
+  try {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    // Lấy songs + countries cùng lúc
+    const [songsRes, countriesRes] = await Promise.all([
+      fetch("http://localhost:8080/songs?page=0&size=50", { headers }),
+      fetch("http://localhost:8080/countries", { headers }),
+    ]);
+
+    if (!songsRes.ok || !countriesRes.ok)
+      throw new Error("Lỗi khi tải dữ liệu bài hát hoặc quốc gia");
+
+    const [songsData, countriesData] = await Promise.all([
+      songsRes.json(),
+      countriesRes.json(),
+    ]);
+
+    const songList = songsData.result.content;
+    const countryList = countriesData.result;
+
+    // Tìm id VN
+    const vietnamCountry = countryList.find(c => c.code === "viet-nam");
+    const vietnamCountryId = vietnamCountry?.id;
+    if (!vietnamCountryId) throw new Error("Không tìm thấy quốc gia Việt Nam!");
+
+    // Lấy danh sách nghệ sĩ VN
+    const vietnamArtistsRes = await fetch(
+      `http://localhost:8080/countries/${vietnamCountryId}/with-artists`,
+      { headers }
+    );
+    if (!vietnamArtistsRes.ok) throw new Error("Lỗi lấy nghệ sĩ VN");
+
+    const vietnamArtistsData = await vietnamArtistsRes.json();
+    const vietnameseArtistNames = vietnamArtistsData.result.artists.map(a => a.name);
+
+    // Lọc bài không thuộc nghệ sĩ VN
+    const nonVietnameseSongs = songList.filter(
+      song => !vietnameseArtistNames.includes(song.artistName)
+    );
+
+    console.log("nonVietnameseSongs:", nonVietnameseSongs);
+
+    const latestEnglishContent = document.getElementById("latest-english-content");
+    if (!latestEnglishContent) return;
+
+    latestEnglishContent.innerHTML = "";
+
+    nonVietnameseSongs.slice(0, 6).forEach(song => {
+      const card = document.createElement("div");
+      card.className = "latest-english-card-container";
+      card.innerHTML = `
+        <img src="${song.imgUrl}" alt="${song.title}" />
+        <p>${song.title}</p>
+      `;
+      card.addEventListener("click", () => {
+        playerController.loadSongById(song.id);
+      });
+      latestEnglishContent.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Lỗi khi load bài hát:", error);
+  }
+}
+
+async function loadAllSongs() {
+  const token = getCookie('authToken');
+  try {
+    const res = await fetch("http://localhost:8080/songs", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+    const data = await res.json();
+    playlist = data.result.content || [];
+    renderQueue();
+    renderLatestReleases();
+  } catch (error) {
+    console.error("Error loading playlist:", error);
+  }
+}
+
+function renderQueue() {
+  const queueContainer = document.querySelector(".queue-elements-container");
+  if (!queueContainer) return;
+
+  queueContainer.innerHTML = "";
+
+  playlist.forEach((song, index) => {
+    const queueElement = document.createElement("div");
+    queueElement.classList.add("queue-element");
+    queueElement.innerHTML = `
+      <div class="song-image-container">
+        <p class="queue-number">${(index + 1).toString().padStart(2, "0")}</p>
+        <div class="image-container">
+          <img class="queue-song-img" src="${song.imgUrl}" />
+          <i class="fas play-btn fa-play"></i>
+        </div>
+        <div class="song-and-artist-container">
+          <p class="queue-song-name">${song.title}</p>
+          <p class="queue-artist-name">${song.artistName}</p>
+        </div>
+      </div>
+      <span class="nav-link">
+        <button><i class="far wishlist-icon fa-heart"></i></button>
+      </span>
+    `;
+
+    queueElement.addEventListener("click", () => {
+      currentSongIndex = index;
+      playerController.loadSongById(song.id);
+      renderQueue();
+    });
+
+    queueContainer.appendChild(queueElement);
+  });
+}
+
+function renderLatestReleases() {
+  const cards = document.querySelectorAll(".latest-release-card");
+  if (!cards.length) return;
+
+  cards.forEach((card, index) => {
+    const song = playlist[index];
+    if (!song) return;
+
+    const nameElement = card.querySelector(".song-name");
+    if (nameElement) nameElement.textContent = song.title;
+
+    const artistElement = card.querySelector(".date");
+    if (artistElement) artistElement.textContent = song.artistName;
+
+    const imgContainer = card.querySelector(".latest-release-img-container");
+    if (imgContainer) {
+      imgContainer.style.backgroundImage = `url('${song.imgUrl}')`;
+      imgContainer.style.backgroundSize = "cover";
+      imgContainer.style.backgroundPosition = "center";
+    }
+
+    const durationElement = card.querySelector(".time");
+    if (durationElement) durationElement.textContent = song.duration;
+
+    card.addEventListener("click", () => {
+      currentSongIndex = index;
+      playerController.loadSongByIndex(currentSongIndex);
+      playerController.playSong();
+      
+    });
+  });
+}
+

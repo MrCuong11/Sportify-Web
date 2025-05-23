@@ -1,214 +1,129 @@
-const createBtn = document.getElementById("createPlaylistBtn");
+import { playerController } from "./playMusic.js"; // import đúng hàm
+
+const token = getCookie("authToken");
+
+const state = {
+  token: token,
+  currentPlaylistId: null,
+  listSongs: [],
+};
+
 const modal = document.getElementById("createPlaylistModal");
-const cancelBtn = document.getElementById("cancelCreateBtn");
-const confirmBtn = document.getElementById("confirmCreateBtn");
-const backBtn = document.getElementById("backToPlaylistsBtn");
-const playlistGrid = document.querySelector(".playlist-grid");
-const songSearchInput = document.getElementById("song-search");
-const suggestedList = document.querySelector(".suggestion-list");
 
-document.addEventListener("DOMContentLoaded", () => {
-  const menuBtn = document.querySelector(".menu-btn");
-  const dropdownDelete = document.querySelector(".menu-dropdown-delete");
-  const deleteBtnImg = document.querySelector(".delete-playlist-btn");
-
-  menuBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    dropdownDelete.style.display =
-      dropdownDelete.style.display === "block" ? "none" : "block";
-  });
-
-  document.addEventListener("click", () => {
-    dropdownDelete.style.display = "none";
-  });
-
-  deleteBtnImg.addEventListener("click", () => {
-    const confirmDelete = confirm("Bạn có chắc muốn xóa playlist này không?");
-    if (!confirmDelete) return;
-
-    // bạn thay bằng id thật
-
-    fetch(
-      `http://localhost:8080/playlists/${window.currentPlaylistId}/archive`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-      .then((res) => {
-        if (res.ok) {
-          alert("Đã xóa playlist thành công!");
-          window.history.back();
-        } else {
-          alert("Xóa không thành công.");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Có lỗi xảy ra khi xóa.");
-      });
-  });
-});
-
-function renderPlaylists(playlists) {
-  // Xóa hết các item cũ (chừa nút tạo mới)
-  const createNewBtn = document.querySelector(".create-new");
-  playlistGrid.innerHTML = ""; // Xóa toàn bộ
-  playlistGrid.appendChild(createNewBtn); // Chèn lại nút tạo mới
-  // console.log(playlists);
-
-  playlists.forEach((playlist) => {
-    const item = document.createElement("div");
-    item.classList.add("playlist-item");
-
-    // Tạo ảnh (nếu có), nếu không thì div trống
-    let thumbHTML = "";
-    if (playlist.image_url) {
-      thumbHTML = `<img class="playlist-thumb" src="${playlist.image_url}" alt="">`;
-    } else {
-      thumbHTML = `<div class="playlist-thumb"></div>`;
-    }
-
-    item.innerHTML = `
-      ${thumbHTML}
-      <div class="playlist-info">
-        <h3>${playlist.name}</h3>
-        
-      </div>
-    `;
-
-    // Khi click vào playlist
-    item.addEventListener("click", () => {
-      window.currentPlaylistId = playlist.id;
-      // 1. Ẩn danh sách playlist, hiện phần chi tiết
-      document.querySelector(".playlist-container").style.display = "none";
-      document.querySelector(".playlist-wrap").style.display = "flex";
-
-      // 2. Gán thông tin playlist vào .playlist-infomation
-      const infoBox = document.querySelector(".playlist-infomation");
-      const coverDiv = infoBox.querySelector(".cover");
-      const nameEl = infoBox.querySelector("h2");
-      const creatorEl = infoBox.querySelectorAll("p")[0];
-      const visibilityEl = infoBox.querySelectorAll("p")[1];
-
-      // Cập nhật ảnh bìa
-      coverDiv.innerHTML = playlist.image_url
-        ? `<img src="${playlist.image_url}" alt="cover">`
-        : `<img src="https://img.icons8.com/ios/50/music-record.png" alt="default">`;
-
-      // Cập nhật thông tin
-      nameEl.textContent = playlist.name;
-      creatorEl.textContent = `Tạo bởi ${playlist.creator || "Bạn"}`;
-      visibilityEl.textContent = playlist.public ? "Công khai" : "Riêng tư";
-
-      // 3. Gọi API để lấy danh sách bài hát (nếu có endpoint)
-
-      const songs = playlist.songs || [];
-      console.log(songs);
-      renderSongsInPlaylist(songs);
-    });
-
-    playlistGrid.appendChild(item);
-  });
+// Các hàm xử lý
+function bindUI() {
+  document.addEventListener("DOMContentLoaded", () => {});
 }
 
-// Hàm fetch từ API
-function loadPlaylists() {
-  fetch("http://localhost:8080/playlists", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error(`Lỗi: ${res.status}`);
-      return res.json();
-    })
-    .then((data) => {
-      renderPlaylists(data.result.content);
-    })
-    .catch((err) => {
-      console.error("Lỗi khi tải playlist:", err);
-    });
-}
+document.querySelector(".menu-btn")?.addEventListener("click", toggleMenu);
 
-// Gọi khi trang load
-document.addEventListener("DOMContentLoaded", loadPlaylists);
+document.addEventListener("click", closeMenus);
+document
+  .querySelector(".delete-playlist-btn")
+  ?.addEventListener("click", deletePlaylist);
 
-createBtn.addEventListener("click", () => {
-  modal.style.display = "flex";
-});
+document
+  .getElementById("song-search")
+  ?.addEventListener("input", showSuggestions);
 
-cancelBtn.addEventListener("click", () => {
+document
+  .getElementById("createPlaylistBtn")
+  ?.addEventListener("click", () => (modal.style.display = "flex"));
+document.getElementById("cancelCreateBtn")?.addEventListener("click", () => {
   modal.style.display = "none";
   clearModalInputs();
 });
+document
+  .getElementById("confirmCreateBtn")
+  ?.addEventListener("click", createPlaylist);
 
-confirmBtn.addEventListener("click", async () => {
-  const name = document.getElementById("playlistNameInput").value.trim();
-  const imgLink = document.getElementById("playlistImageInput").value.trim();
-
-  if (!name) {
-    alert("Vui lòng nhập tên playlist!");
-    return;
-  }
-
-  try {
-    const response = await fetch("http://localhost:8080/playlists", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name: name,
-        image_url: imgLink,
-      }),
-    });
-
-    if (!response.ok) {
-      const text = await response.text(); // lấy lỗi cụ thể
-      throw new Error(`Lỗi: ${response.status} - ${text}`);
-    }
-
-    // const newPlaylist = await response.json();
-
-    // Thêm vào UI (sử dụng response trả về từ server nếu cần)
-    // addNewPlaylist(newPlaylist.name, newPlaylist.image_url);
-
-    loadPlaylists();
-
-    modal.style.display = "none";
-    clearModalInputs();
-    alert("Tạo playlist thành công!");
-  } catch (error) {
-    console.error(error);
-    alert("Có lỗi khi tạo playlist: " + error.message);
-  }
+document.getElementById("backToPlaylistsBtn")?.addEventListener("click", () => {
+  document.querySelector(".playlist-container").style.display = "block";
+  document.querySelector(".playlist-wrap").style.display = "none";
 });
 
-// Hàm thêm playlist mới (hiện tại thêm giả vào grid)
-function addNewPlaylist(name, imgLink) {
+function toggleMenu(e) {
+  e.stopPropagation();
+  const dropdown = document.querySelector(".menu-dropdown-delete");
+  dropdown.style.display =
+    dropdown.style.display === "block" ? "none" : "block";
+}
+
+function closeMenus() {
+  document
+    .querySelector(".menu-dropdown-delete")
+    ?.style.setProperty("display", "none");
+  document
+    .querySelectorAll(".dropdown-menu-playlist")
+    .forEach((menu) => menu.classList.remove("show"));
+}
+
+function deletePlaylist() {
+  if (!confirm("Bạn có chắc muốn xóa playlist này không?")) return;
+
+  fetch(`http://localhost:8080/playlists/${state.currentPlaylistId}/archive`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${state.token}`,
+    },
+  })
+    .then((res) =>
+      res.ok ? window.history.back() : alert("Xóa không thành công.")
+    )
+    .catch(() => alert("Có lỗi xảy ra khi xóa."));
+}
+
+function loadPlaylists() {
+  fetch("http://localhost:8080/playlists", {
+    headers: { Authorization: `Bearer ${state.token}` },
+  })
+    .then((res) => res.json())
+    .then((data) => renderPlaylists(data.result.content))
+    .catch(console.error);
+}
+
+function renderPlaylists(playlists) {
   const grid = document.querySelector(".playlist-grid");
-  const item = document.createElement("div");
-  item.className = "playlist-item";
+  const createBtn = document.querySelector(".create-new");
+  grid.innerHTML = "";
+  grid.appendChild(createBtn);
 
-  item.innerHTML = `
-    ${
-      imgLink
-        ? `<img class="playlist-thumb" src="${imgLink}" alt="">`
-        : `<div class="playlist-thumb"></div>`
-    }
-    <div class="playlist-info">
-      <h3>${name}</h3>
-      <p>Bạn</p>
-    </div>
-  `;
+  // Lọc bỏ playlist bị archive
+  const activePlaylists = playlists.filter((p) => !p.archive);
 
-  // Thêm vào lưới
-  grid.appendChild(item);
+  activePlaylists.forEach((playlist) => {
+    const item = document.createElement("div");
+    item.className = "playlist-item";
+    item.innerHTML = `
+      ${
+        playlist.image_url
+          ? `<img class="playlist-thumb" src="${playlist.image_url}">`
+          : `<div class="playlist-thumb"></div>`
+      }
+      <div class="playlist-info"><h3>${playlist.name}</h3></div>`;
+
+    item.addEventListener("click", () => openPlaylist(playlist));
+    grid.appendChild(item);
+  });
+}
+
+function openPlaylist(playlist) {
+  state.currentPlaylistId = playlist.id;
+  document.querySelector(".playlist-container").style.display = "none";
+  document.querySelector(".playlist-wrap").style.display = "flex";
+
+  const infoBox = document.querySelector(".playlist-infomation");
+  infoBox.querySelector(".cover").innerHTML = playlist.image_url
+    ? `<img src="${playlist.image_url}" alt="cover">`
+    : `<img src="https://img.icons8.com/ios/50/music-record.png" alt="default">`;
+
+  infoBox.querySelector("h2").textContent = playlist.name;
+  const [creatorEl, visibilityEl] = infoBox.querySelectorAll("p");
+  creatorEl.textContent = `Tạo bởi ${playlist.creator || "Bạn"}`;
+  visibilityEl.textContent = playlist.public ? "Công khai" : "Riêng tư";
+
+  renderSongsInPlaylist(playlist.songs || []);
 }
 
 function clearModalInputs() {
@@ -216,260 +131,127 @@ function clearModalInputs() {
   document.getElementById("playlistImageInput").value = "";
 }
 
-backBtn.addEventListener("click", function () {
-  document.querySelector(".playlist-container").style.display = "block";
-  document.querySelector(".playlist-wrap").style.display = "none";
-});
+async function createPlaylist() {
+  const name = document.getElementById("playlistNameInput").value.trim();
+  const img = document.getElementById("playlistImageInput").value.trim();
+  if (!name) return alert("Vui lòng nhập tên playlist!");
 
-let listSongs = [];
-async function fetchAllSongs() {
   try {
-    const response = await fetch("http://localhost:8080/songs?size=100", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Lỗi: ${response.status}`);
-    }
-
-    const data = await response.json();
-    listSongs = data.result.content;
-    return data.result.content || []; // giả sử dữ liệu nằm trong result.content
-  } catch (error) {
-    console.error("Lỗi khi tải danh sách bài hát:", error);
-    return [];
-  }
-}
-
-async function renderSongsInPlaylist(songsInPlaylist) {
-  const emptyMessage = document.querySelector(".empty-message");
-  const songListContainer = document.querySelector(".song-list");
-
-  // Clear nội dung cũ
-  songListContainer.innerHTML = "";
-
-  if (!songsInPlaylist || songsInPlaylist.length === 0) {
-    emptyMessage.style.display = "flex";
-    songListContainer.style.display = "none";
-    return;
-  }
-
-  emptyMessage.style.display = "none";
-  songListContainer.style.display = "block";
-
-  // Giả sử bạn đã có allSongs từ API
-  const allSongs = await fetchAllSongs();
-  console.log("allSongs", allSongs); // Tự viết hàm này
-
-  songsInPlaylist.forEach((playlistSong) => {
-    const fullSong = allSongs.find((s) => s.id === playlistSong.songId);
-    console.log("fullSong:", fullSong);
-    if (!fullSong) return;
-
-    const songItem = document.createElement("div");
-
-    songItem.classList.add("song-row");
-    songItem.innerHTML = `
-      <div class="song-info">
-        <img src="${
-          fullSong.imgUrl || "https://img.icons8.com/ios/50/music.png"
-        }" alt="thumb" />
-        <div>
-          <p class="song-title">${fullSong.title}</p>
-          <p class="song-artist">${fullSong.artistName || "Không rõ"}</p>
-        </div>
-      </div>
-      <div class="song-album">${fullSong.album || "—"}</div>
-      <div class="song-duration">${fullSong.duration || "00:00"}</div>
-      <div class="song-actions">
-        <button class="action-btn">⋮</button>
-        <div class="dropdown-menu-playlist hidden">
-          <button class="delete-btn">Xoá</button>
-        </div>
-      </div>
-    `;
-    // Trong renderSongsInPlaylist — thêm đoạn này vào ngay sau khi tạo songItem
-    const actionBtn = songItem.querySelector(".action-btn");
-    const dropdown = songItem.querySelector(".dropdown-menu-playlist");
-    const deleteBtn = songItem.querySelector(".delete-btn");
-
-    // Toggle dropdown
-    actionBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      dropdown.classList.toggle("show");
-    });
-
-    // Click ngoài thì ẩn menu (để trong vòng lặp sẽ thêm cho từng bài hát)
-    document.addEventListener("click", () => {
-      dropdown.classList.remove("show");
-    });
-
-    // Xoá bài hát khỏi playlist
-    deleteBtn.addEventListener("click", async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8080/playlists/remove-song",
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              playlistId: window.currentPlaylistId,
-              songIds: [fullSong.id],
-            }),
-          }
-        );
-
-        if (!response.ok) throw new Error("Xoá thất bại");
-
-        alert("Đã xoá bài hát khỏi playlist");
-
-        // Reload lại danh sách bài hát
-        const updated = await fetch("http://localhost:8080/playlists", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const updatedPlaylist = await updated.json();
-
-        const currentPlaylist = updatedPlaylist.result?.content?.find(
-          (pl) => pl.id === window.currentPlaylistId
-        );
-
-        const songs = currentPlaylist?.songs || [];
-        renderSongsInPlaylist(songs);
-      } catch (err) {
-        console.error(err);
-        alert("Lỗi khi xoá bài hát");
-      }
-    });
-
-    const songInfo = songItem.querySelector(".song-info");
-    songInfo.style.cursor = "pointer";
-    songInfo.addEventListener("click", async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:8080/songs/${fullSong.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) throw new Error("Không thể lấy thông tin bài hát");
-
-        const songDetails = await response.json();
-        const audioUrl = songDetails.result?.audioUrl;
-
-        if (!audioUrl) {
-          alert("Không có file nhạc để phát");
-          return;
-        }
-
-        const audioPlayer = document.getElementById("audio");
-        audioPlayer.src = audioUrl;
-        
-        document.querySelector(".playingSong__title-name").textContent =
-          songDetails.result?.title || "Không rõ tiêu đề";
-
-        document.querySelector(".playingSong__title-singer").textContent =
-          songDetails.result?.artistName || "Không rõ nghệ sĩ";
-
-        const imgDiv = document.getElementById("footer-song-image");
-        if (imgDiv) {
-          imgDiv.style.backgroundImage = `url('${
-            songDetails.result?.imgUrl ||
-            "https://img.icons8.com/ios/50/music.png"
-          }')`;
-          imgDiv.style.backgroundSize = "cover";
-          imgDiv.style.backgroundPosition = "center";
-        }
-        audioPlayer.play();
-      } catch (error) {
-        console.error("Lỗi khi phát nhạc:", error);
-        alert("Lỗi khi phát nhạc");
-      }
-    });
-
-    songListContainer.appendChild(songItem);
-  });
-}
-
-const searchInput = document.getElementById("song-search");
-const suggestionList = document.getElementById("suggestion-list");
-searchInput.addEventListener("input", () => {
-  const keyword = searchInput.value.toLowerCase().trim();
-  suggestionList.innerHTML = "";
-
-  if (!keyword) return;
-
-  const filtered = listSongs.filter((song) => {
-    return (
-      song.title.toLowerCase().includes(keyword) ||
-      song.artistName.toLowerCase().includes(keyword)
-    );
-  });
-
-  filtered.forEach((song) => {
-    const item = document.createElement("div");
-    item.classList.add("suggestion-item");
-
-    item.innerHTML = `
-      <div class="suggestion-info">
-        <div class="suggestion-title">${song.title}</div>
-        <div class="suggestion-artist">${song.artistName}</div>
-      </div>
-      <button class="add-btn">Thêm</button>
-    `;
-
-    // Bắt sự kiện nút thêm
-    item.querySelector(".add-btn").addEventListener("click", () => {
-      addSongToPlaylist(song.id);
-      songSearchInput.value = "";
-      if (suggestedList) {
-        suggestedList.innerHTML = "";
-        suggestedList.classList.add("hidden"); // hoặc dùng style.display = "none"
-      }
-    });
-
-    suggestionList.appendChild(item);
-  });
-});
-
-// Hàm thêm bài hát vào playlist
-async function addSongToPlaylist(songId) {
-  try {
-    const response = await fetch("http://localhost:8080/playlists/add-songs", {
+    const res = await fetch("http://localhost:8080/playlists", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${state.token}`,
       },
-      body: JSON.stringify({
-        playlistId: window.currentPlaylistId,
-        songIds: [songId],
-      }),
+      body: JSON.stringify({ name, image_url: img }),
+    });
+    if (!res.ok) throw new Error();
+    loadPlaylists();
+    document.getElementById("createPlaylistModal").style.display = "none";
+    clearModalInputs();
+    alert("Tạo playlist thành công!");
+  } catch {
+    alert("Có lỗi khi tạo playlist");
+  }
+}
+
+async function fetchAllSongs() {
+  try {
+    const res = await fetch("http://localhost:8080/songs?size=100", {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+    state.listSongs = data.result.content;
+  } catch (err) {
+    console.error("Lỗi khi tải danh sách bài hát:", err);
+  }
+}
+
+async function renderSongsInPlaylist(songs) {
+  const container = document.querySelector(".song-list");
+  const empty = document.querySelector(".empty-message");
+  container.innerHTML = "";
+
+  if (!songs.length) {
+    empty.style.display = "flex";
+    container.style.display = "none";
+    return;
+  }
+
+  empty.style.display = "none";
+  container.style.display = "block";
+
+  const allSongs = state.listSongs;
+
+  songs.forEach((song) => {
+    const full = allSongs.find((s) => s.id === song.songId);
+    if (!full) return;
+
+    const el = document.createElement("div");
+    el.className = "song-row";
+    el.innerHTML = `
+      <div class="song-info">
+        <img src="${
+          full.imgUrl || "https://img.icons8.com/ios/50/music.png"
+        }" />
+        <div><p class="song-title">${full.title}</p><p class="song-artist">${
+      full.artistName
+    }</p></div>
+      </div>
+      <div class="song-album">${full.album || "—"}</div>
+      <div class="song-duration">${full.duration || "00:00"}</div>
+      <div class="song-actions">
+        <button class="action-btn">⋮</button>
+        <div class="dropdown-menu-playlist hidden"><button class="delete-btn">Xoá</button></div>
+      </div>`;
+
+    el.querySelector(".action-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      el.querySelector(".dropdown-menu-playlist").classList.toggle("show");
     });
 
-    if (!response.ok) throw new Error("Thêm thất bại");
-    alert("Đã thêm bài hát vào playlist!");
+    el.querySelector(".delete-btn").addEventListener("click", () =>
+      removeSong(full.id)
+    );
 
-    // Lấy lại toàn bộ playlist
-    const updated = await fetch("http://localhost:8080/playlists", {
+    el.querySelector(".song-info").addEventListener("click", () =>
+      playerController.loadSongById(full.id)
+    );
+    container.appendChild(el);
+  });
+}
+
+async function removeSong(id) {
+  try {
+    const response = await fetch(
+      "http://localhost:8080/playlists/remove-song",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${state.token}`,
+        },
+        body: JSON.stringify({
+          playlistId: state.currentPlaylistId,
+          songIds: [id],
+        }),
+      }
+    );
+
+    if (!response.ok) throw new Error("Xóa thất bại");
+    alert("Đã xoá bài hát khỏi playlist");
+
+    // Lấy lại toàn bộ playlist để tìm playlist hiện tại
+    const updatedRes = await fetch("http://localhost:8080/playlists", {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${state.token}`,
       },
     });
-    const updatedPlaylist = await updated.json();
+    const data = await updatedRes.json();
 
-    // ✅ Tìm playlist có ID trùng với window.currentPlaylistId
-    const currentPlaylist = updatedPlaylist.result?.content?.find(
-      (pl) => pl.id === window.currentPlaylistId
+    // Tìm playlist hiện tại theo ID
+    const currentPlaylist = data.result?.content?.find(
+      (pl) => pl.id === state.currentPlaylistId
     );
 
     if (!currentPlaylist) {
@@ -477,15 +259,88 @@ async function addSongToPlaylist(songId) {
       return;
     }
 
-    // ✅ Gọi lại render với danh sách bài hát mới
-    const songs = currentPlaylist.songs || [];
+    // Render lại danh sách bài hát trong playlist hiện tại
+    renderSongsInPlaylist(currentPlaylist.songs || []);
+  } catch (err) {
+    console.error("Lỗi khi xoá bài hát:", err);
+    alert("Lỗi khi xoá bài hát");
+  }
+}
 
-    renderSongsInPlaylist(songs);
+function showSuggestions() {
+  const input = document
+    .getElementById("song-search")
+    .value.trim()
+    .toLowerCase();
+  const list = document.getElementById("suggestion-list");
+  list.innerHTML = "";
+  if (!input) return;
+
+  const results = state.listSongs.filter(
+    (s) =>
+      s.title.toLowerCase().includes(input) ||
+      s.artistName.toLowerCase().includes(input)
+  );
+
+  results.forEach((song) => {
+    const item = document.createElement("div");
+    item.className = "suggestion-item";
+    item.innerHTML = `<div class="suggestion-info"><div class="suggestion-title">${song.title}</div><div class="suggestion-artist">${song.artistName}</div></div><button class="add-btn">Thêm</button>`;
+    item
+      .querySelector(".add-btn")
+      .addEventListener("click", () => addSongToPlaylist(song.id));
+    list.appendChild(item);
+  });
+}
+
+async function addSongToPlaylist(songId) {
+  try {
+    // Gửi yêu cầu thêm bài hát vào playlist
+    const response = await fetch("http://localhost:8080/playlists/add-songs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({
+        playlistId: state.currentPlaylistId,
+        songIds: [songId],
+      }),
+    });
+
+    if (!response.ok) throw new Error("Thêm thất bại");
+    alert("Đã thêm bài hát vào playlist!");
+
+    // Lấy lại danh sách tất cả playlists
+    const updatedRes = await fetch("http://localhost:8080/playlists", {
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+      },
+    });
+    const data = await updatedRes.json();
+
+    // Tìm playlist hiện tại theo ID
+    const currentPlaylist = data.result?.content?.find(
+      (pl) => pl.id === state.currentPlaylistId
+    );
+
+    if (!currentPlaylist) {
+      console.error("Không tìm thấy playlist tương ứng");
+      return;
+    }
+
+    // Gọi lại hàm render với danh sách bài hát mới
+    renderSongsInPlaylist(currentPlaylist.songs || []);
   } catch (error) {
     console.error("Lỗi thêm bài hát:", error);
     alert("Lỗi thêm bài hát!");
   }
 }
 
-// Gọi ban đầu để lấy danh sách bài hát
-fetchAllSongs();
+// Export init function để bên ngoài gọi
+export function init() {
+  bindUI();
+  fetchAllSongs();
+  loadPlaylists();
+  
+}

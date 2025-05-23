@@ -1,4 +1,8 @@
-/* The Following code is written by Dhruv Arora (github.com/itsdhruvarora) */
+
+@import url(./artist.css);
+@import url(./playlist.css);
+@import url(./favorite.css);
+@import url(./reset-password.css);
 /* set size of root element */
 
 html {
@@ -69,31 +73,6 @@ body {
     padding: 10px 20px;
 }
 
-/* .search-box {
-    padding: 0.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    background-color: #12183F;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 50%;
-    margin-right: 4rem;
-}
-
-.search-box input {
-    font-size: 1.1rem;
-    padding: 0.6rem;
-    padding-left: 0.1rem;
-    background-color: transparent;
-    width: 80%;
-    height: 0.7rem;
-    border: 0;
-    margin-left: 0.3rem;
-    margin-right: 0.3rem;
-    color: white;
-} */
 
 .search-box {
     display: flex;
@@ -121,12 +100,7 @@ body {
     /* font-size: 2rem; */
 }
 
-/* .profile-photo {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 1.5rem;
-    margin-left: 0.8rem;
-} */
+
 
 .profile-container {
     position: relative;
@@ -1189,9 +1163,7 @@ footer {
     align-items: center;
     justify-content: space-around;
     z-index: 1000;
-    
     height:74px;
-    margin-left: -50px;
 }
 
 #footer-song-info {

@@ -32,7 +32,7 @@ function eraseCookie(name) {
 }
 
 function redirectToLogin() {
-  window.location.href = "/FrontEnd/pages/login.html"; // hoặc bất kỳ trang login nào bạn đang dùng
+  window.location.href = "/pages/login.html"; // hoặc bất kỳ trang login nào bạn đang dùng
 }
 
 async function handleLogout() {
@@ -111,62 +111,105 @@ window.addEventListener("click", function (e) {
 });
 
 // Trang profile
-async function updateProfileInfo() {
-  if (!username) return;
+// async function updateProfileInfo() {
+//   if (!username) return;
 
-  // Cập nhật tên
-  document.getElementById("displayName").textContent = username;
+//   // Cập nhật tên
+//   document.getElementById("displayName").textContent = username;
 
-  // Gọi API để đếm số lượng playlist
-  try {
-    const response = await fetch(`http://localhost:8080/playlists`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+//   // Gọi API để đếm số lượng playlist
+//   try {
+//     const response = await fetch(`http://localhost:8080/playlists`, {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
 
-    if (response.ok) {
-      const playlists = await response.json();
-      const count = playlists.result.content.length;
-      document.getElementById(
-        "playlistCount"
-      ).textContent = `${count} danh sách phát công khai`;
-      const playlistGrid = document.querySelector(".playlist-grid");
-      const playlistData = playlists.result.content;
-      playlistData.forEach((playlist, index) => {
-        const card = document.createElement("div");
-        card.className = "playlist-card";
+//     if (response.ok) {
+//       const playlists = await response.json();
+//       const count = playlists.result.content.length;
+//       document.getElementById(
+//         "playlistCount"
+//       ).textContent = `${count} danh sách phát công khai`;
+//       const playlistGrid = document.querySelector(".playlist-grid");
+//       const playlistData = playlists.result.content;
+//       playlistData.forEach((playlist, index) => {
+//         const card = document.createElement("div");
+//         card.className = "playlist-card";
 
-        const icon = document.createElement("div");
-        icon.className = "playlist-icon";
-        icon.textContent = index % 2 === 0 ? "♪" : "♫";
+//         const icon = document.createElement("div");
+//         icon.className = "playlist-icon";
+//         icon.textContent = index % 2 === 0 ? "♪" : "♫";
 
-        const title = document.createElement("div");
-        title.className = "playlist-title";
-        title.textContent = playlist.name;
+//         const title = document.createElement("div");
+//         title.className = "playlist-title";
+//         title.textContent = playlist.name;
 
-        const creator = document.createElement("div");
-        creator.className = "playlist-creator";
-        creator.textContent = `Của ${playlist.creator}`;
+//         const creator = document.createElement("div");
+//         creator.className = "playlist-creator";
+//         creator.textContent = `Của ${playlist.creator}`;
 
-        card.addEventListener("click", () => {
-          window.location.href = `../pages/playlist.html?id=${playlist.id}`;
-        });
+//         card.addEventListener("click", () => {
+//           window.location.href = `../pages/playlist.html?id=${playlist.id}`;
+//         });
 
-        card.appendChild(icon);
-        card.appendChild(title);
-        card.appendChild(creator);
+//         card.appendChild(icon);
+//         card.appendChild(title);
+//         card.appendChild(creator);
 
-        playlistGrid.appendChild(card);
-      });
-    } else {
-      console.error("Không lấy được danh sách phát:", response.status);
-    }
-  } catch (err) {
-    console.error("Lỗi khi gọi API playlist:", err);
-  }
+//         playlistGrid.appendChild(card);
+//       });
+//     } else {
+//       console.error("Không lấy được danh sách phát:", response.status);
+//     }
+//   } catch (err) {
+//     console.error("Lỗi khi gọi API playlist:", err);
+//   }
+// }
+
+// updateProfileInfo();
+
+function openModal() {
+  document.getElementById("passwordModal").style.display = "flex";
 }
 
-updateProfileInfo();
+function closeModal() {
+  document.getElementById("passwordModal").style.display = "none";
+}
+
+function submitNewPassword() {
+  const newPassword = document.getElementById("newPassword").value;
+  const getToken = getCookie("authToken");
+  console.log(getToken);
+
+  if (!newPassword.trim()) {
+    alert("Vui lòng nhập mật khẩu mới.");
+    return;
+  }
+
+  fetch(
+    `http://localhost:8080/auth/reset-password?token=${getToken}&newPassword=${newPassword}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Đổi mật khẩu thất bại!");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      alert("Mật khẩu đã được cập nhật!");
+      closeModal();
+    })
+    .catch((error) => {
+      console.error("Lỗi:", error);
+      alert("Đã xảy ra lỗi khi cập nhật mật khẩu.");
+    });
+}

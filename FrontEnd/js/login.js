@@ -96,25 +96,6 @@ async function login(e) {
         document.cookie = `authToken=${token}; path=/; max-age=3600`; // Expires in 7 days
 
 
-        //const name = decodeCValue(id.value).username; // Assuming the username is still decoded from cookies or session
-
-        // Log out every user who has existing remember-me sessions
-        // logOut();
-        // RememberMe() verifies if the box is checked and performs the according actions
-        // RememberMe({
-        //     email: id.value,
-        //     password: password.value,
-        //     rememberMe: rememberMe.checked
-        // });
-
-        // Save the token in localStorage or sessionStorage for future requests
-        // if (rememberMe.checked) {
-        //     localStorage.setItem('authToken', token);
-        // } else {
-        //     sessionStorage.setItem('authToken', token);
-        // }
-
-        // Login successful, proceed to display a successful login text and redirect to another page
         displayLogin(name);
     } else {
         // If login failed, no need to add any warnings manually, they're set by verifyLoginCredentials
