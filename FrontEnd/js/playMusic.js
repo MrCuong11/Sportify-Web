@@ -21,6 +21,8 @@ const expandLyricsBtn = document.getElementById("expand-lyrics-btn");
 const lyricsPopup = document.getElementById("lyrics-popup");
 const lyricsContainer = document.getElementById("lyrics-container");
 
+let initialized = false;
+
 const token = getCookie("authToken");
 
 let isPlaying = false;
@@ -105,7 +107,9 @@ function loadSongById(songId) {
         imageEl.style.backgroundSize = "cover";
         imageEl.style.backgroundPosition = "center";
         currentSongId = songData.id;
-        playSong();
+        audio.onloadedmetadata = () => {
+          playSong();
+        };
       }
     });
 }
@@ -161,6 +165,8 @@ function renderLyrics() {
 }
 
 function initPlayer() {
+  if (initialized) return;
+  initialized = true;
   if (!token) {
     seekBar.disabled = true;
     seekBar.style.opacity = 0.5;
@@ -193,29 +199,30 @@ function initPlayer() {
     });
 
   // Event listeners
-  playPauseBtn.addEventListener("click", () =>
-    isPlaying ? pauseSong() : playSong()
-  );
-  nextBtn.addEventListener("click", nextSong);
-  prevBtn.addEventListener("click", prevSong);
-
-  shuffleBtn.addEventListener("click", () => {
-    isShuffle = !isShuffle;
-    shuffleBtn.classList.toggle("active");
-  });
-
-  repeatBtn.addEventListener("click", () => {
-    isRepeat = !isRepeat;
-    repeatBtn.classList.toggle("active");
-  });
-
-  seekBar.addEventListener("input", () => {
-    audio.currentTime = seekBar.value;
-  });
-
-  volumeSlider.addEventListener("input", () => {
-    audio.volume = volumeSlider.value / 100;
-  });
+ if (playPauseBtn)
+    playPauseBtn.addEventListener("click", () =>
+      isPlaying ? pauseSong() : playSong()
+    );
+  if (nextBtn) nextBtn.addEventListener("click", nextSong);
+  if (prevBtn) prevBtn.addEventListener("click", prevSong);
+  if (shuffleBtn)
+    shuffleBtn.addEventListener("click", () => {
+      isShuffle = !isShuffle;
+      shuffleBtn.classList.toggle("active");
+    });
+  if (repeatBtn)
+    repeatBtn.addEventListener("click", () => {
+      isRepeat = !isRepeat;
+      repeatBtn.classList.toggle("active");
+    });
+  if (seekBar)
+    seekBar.addEventListener("input", () => {
+      audio.currentTime = seekBar.value;
+    });
+  if (volumeSlider)
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = volumeSlider.value / 100;
+    });
 
   audio.addEventListener("loadedmetadata", () => {
     seekBar.max = audio.duration;
@@ -266,13 +273,13 @@ function initPlayer() {
     }
   });
 
-  expandLyricsBtn.addEventListener("click", () => {
-    const isVisible = lyricsPopup.style.display === "flex";
-    lyricsPopup.style.display = isVisible ? "none" : "flex";
-    expandLyricsBtn.classList.toggle("active", !isVisible);
-    // console.log(currentSongId);
-    if (!isVisible) loadLyrics(currentSongId);
-  });
+   if (expandLyricsBtn)
+    expandLyricsBtn.addEventListener("click", () => {
+      const isVisible = lyricsPopup.style.display === "flex";
+      lyricsPopup.style.display = isVisible ? "none" : "flex";
+      expandLyricsBtn.classList.toggle("active", !isVisible);
+      if (!isVisible) loadLyrics(currentSongId);
+    });
 }
 
 
@@ -290,3 +297,4 @@ export const playerController = {
   nextSong,
   prevSong,
 };
+

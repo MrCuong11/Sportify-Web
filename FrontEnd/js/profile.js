@@ -1,3 +1,4 @@
+import { playerController } from "./playMusic.js";
 document.addEventListener("DOMContentLoaded", function () {
   const token = getCookie("authToken");
   const authSection = document.getElementById("authSection");
@@ -17,6 +18,9 @@ document.addEventListener("DOMContentLoaded", function () {
       loginRegister.style.display = "block";
     }
   }
+
+  // --- Tích hợp phần search ---
+  setupSearchFeature(token);
 });
 
 function getCookie(name) {
@@ -32,7 +36,7 @@ function eraseCookie(name) {
 }
 
 function redirectToLogin() {
-  window.location.href = "/pages/login.html"; // hoặc bất kỳ trang login nào bạn đang dùng
+  window.location.href = "./pages/login.html"; // hoặc bất kỳ trang login nào bạn đang dùng
 }
 
 async function handleLogout() {
@@ -67,6 +71,8 @@ async function handleLogout() {
   }
 }
 
+window.handleLogout = handleLogout;
+
 function getUsernameFromToken(token) {
   try {
     const payload = token.split(".")[1];
@@ -82,10 +88,11 @@ function getUsernameFromToken(token) {
 // Ví dụ sử dụng:
 const token = getCookie("authToken");
 const username = getUsernameFromToken(token);
-console.log("Username:", username); // --> "hieulx"
+// console.log("Username:", username); // --> "hieulx"
 
 function setDefaultProfileAvatar(username) {
   const avatar = document.getElementById("profileAvatar");
+  if (!avatar) return;
   const firstChar = username.charAt(0).toUpperCase();
   avatar.textContent = firstChar;
 }
@@ -98,10 +105,12 @@ function toggleDropdown() {
     dropdown.style.display === "block" ? "none" : "block";
 }
 
+window.toggleDropdown = toggleDropdown;
+
 // Ẩn dropdown nếu click ra ngoài
 window.addEventListener("click", function (e) {
   const dropdown = document.getElementById("profileDropdown");
-  const profilePhoto = document.querySelector(".profile-photo");
+  const profilePhoto = document.querySelector(".profile-avatar");
 
   if (!dropdown || !profilePhoto) return;
 
@@ -110,106 +119,129 @@ window.addEventListener("click", function (e) {
   }
 });
 
-// Trang profile
-// async function updateProfileInfo() {
-//   if (!username) return;
 
-//   // Cập nhật tên
-//   document.getElementById("displayName").textContent = username;
+// --------------- PHẦN SEARCH ----------------
 
-//   // Gọi API để đếm số lượng playlist
-//   try {
-//     const response = await fetch(`http://localhost:8080/playlists`, {
-//       method: "GET",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
+let allSongs = [];
+let allArtists = [];
 
-//     if (response.ok) {
-//       const playlists = await response.json();
-//       const count = playlists.result.content.length;
-//       document.getElementById(
-//         "playlistCount"
-//       ).textContent = `${count} danh sách phát công khai`;
-//       const playlistGrid = document.querySelector(".playlist-grid");
-//       const playlistData = playlists.result.content;
-//       playlistData.forEach((playlist, index) => {
-//         const card = document.createElement("div");
-//         card.className = "playlist-card";
+async function fetchAllData(token) {
+  if (!token) return;
 
-//         const icon = document.createElement("div");
-//         icon.className = "playlist-icon";
-//         icon.textContent = index % 2 === 0 ? "♪" : "♫";
+  try {
+    const [songsRes, artistsRes] = await Promise.all([
+      fetch("http://localhost:8080/songs?page=0&size=50", {
+        headers: {
+          // Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }),
+      fetch("http://localhost:8080/artists", {
+        headers: {
+          // Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }),
+    ]);
 
-//         const title = document.createElement("div");
-//         title.className = "playlist-title";
-//         title.textContent = playlist.name;
+    if (!songsRes.ok || !artistsRes.ok) throw new Error("Failed to fetch data");
 
-//         const creator = document.createElement("div");
-//         creator.className = "playlist-creator";
-//         creator.textContent = `Của ${playlist.creator}`;
+    const songsData = await songsRes.json();
+    const artistsData = await artistsRes.json();
 
-//         card.addEventListener("click", () => {
-//           window.location.href = `../pages/playlist.html?id=${playlist.id}`;
-//         });
-
-//         card.appendChild(icon);
-//         card.appendChild(title);
-//         card.appendChild(creator);
-
-//         playlistGrid.appendChild(card);
-//       });
-//     } else {
-//       console.error("Không lấy được danh sách phát:", response.status);
-//     }
-//   } catch (err) {
-//     console.error("Lỗi khi gọi API playlist:", err);
-//   }
-// }
-
-// updateProfileInfo();
-
-function openModal() {
-  document.getElementById("passwordModal").style.display = "flex";
-}
-
-function closeModal() {
-  document.getElementById("passwordModal").style.display = "none";
-}
-
-function submitNewPassword() {
-  const newPassword = document.getElementById("newPassword").value;
-  const getToken = getCookie("authToken");
-  console.log(getToken);
-
-  if (!newPassword.trim()) {
-    alert("Vui lòng nhập mật khẩu mới.");
-    return;
+    allSongs = songsData.result.content || [];
+    // console.log(allSongs);
+    allArtists = artistsData.result.content || [];
+  } catch (error) {
+    console.error("Lỗi khi tải dữ liệu search:", error);
   }
+}
 
-  fetch(
-    `http://localhost:8080/auth/reset-password?token=${getToken}&newPassword=${newPassword}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+function setupSearchFeature(token) {
+  fetchAllData(token).then(() => {
+    initSearch();
+  });
+}
+
+function initSearch() {
+  const searchInput = document.getElementById("searchInput");
+  const suggestionsBox = document.getElementById("searchSuggestions");
+
+  if (!searchInput || !suggestionsBox) return;
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) {
+      suggestionsBox.style.display = "none";
+      suggestionsBox.innerHTML = "";
+      return;
     }
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Đổi mật khẩu thất bại!");
+
+    const matchedSongs = allSongs
+      .filter(
+        (song) =>
+          song.title.toLowerCase().includes(query) ||
+          song.artistName.toLowerCase().includes(query)
+      )
+      .slice(0, 5);
+
+    const matchedArtists = allArtists
+      .filter((artist) => artist.name.toLowerCase().includes(query))
+      .slice(0, 5);
+
+    let html = "";
+
+    if (matchedArtists.length > 0) {
+      html += `<div class="search-suggestion-header">Nghệ sĩ</div>`;
+      matchedArtists.forEach((artist) => {
+        html += `
+          <div class="search-suggestion-item search-suggestion-artist" data-artist-id="${artist.id}">
+             ${artist.name}
+          </div>`;
+      });
+    }
+
+    if (matchedSongs.length > 0) {
+      html += `<div class="search-suggestion-header">Bài hát</div>`;
+      matchedSongs.forEach((song) => {
+        html += `
+          <div class="search-suggestion-item search-suggestion-song" data-song-id="${song.id}">
+             ${song.title} - ${song.artistName}
+          </div>`;
+      });
+    }
+
+    if (!html) {
+      html = `<div class="search-suggestion-item">Không tìm thấy kết quả nào</div>`;
+    }
+
+    suggestionsBox.innerHTML = html;
+    suggestionsBox.style.display = "block";
+  });
+
+  suggestionsBox.addEventListener("click", (e) => {
+    const artistId = e.target.getAttribute("data-artist-id");
+    const songId = e.target.getAttribute("data-song-id");
+
+    if (artistId) {
+      // chuyển trang chi tiết nghệ sĩ
+      window.location.href = `#/artist?id=${artistId}`;
+    } else if (songId) {
+      // phát bài hát - bạn cần gọi hàm load bài hát đúng chỗ này
+      if (typeof playerController !== "undefined" && playerController.loadSongById) {
+        playerController.loadSongById(songId);
+      } else {
+        console.warn("playerController.loadSongById chưa được định nghĩa");
       }
-      return response.json();
-    })
-    .then((data) => {
-      alert("Mật khẩu đã được cập nhật!");
-      closeModal();
-    })
-    .catch((error) => {
-      console.error("Lỗi:", error);
-      alert("Đã xảy ra lỗi khi cập nhật mật khẩu.");
-    });
+    }
+
+    suggestionsBox.style.display = "none";
+    searchInput.value = "";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".search-box")) {
+      suggestionsBox.style.display = "none";
+    }
+  });
 }

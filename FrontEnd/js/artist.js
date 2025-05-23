@@ -86,6 +86,35 @@ function fetchArtistDetails(artistId) {
 
         songList.appendChild(li);
       });
+     const playButton = document.querySelector(".play-button");
+
+if (playButton) {
+  playButton.onclick = () => {
+    if (artist.songs.length > 0) {
+      let index = 0;
+
+      const playNext = () => {
+        if (index < artist.songs.length) {
+          const songId = artist.songs[index].id;
+          playerController.loadSongById(songId);
+          index++;
+        } else {
+          audio.removeEventListener("ended", playNext);
+        }
+      };
+
+      // Đảm bảo lấy đúng phần tử audio do player.js dùng
+      const audio = document.getElementById("audio");
+
+      // Gán sự kiện khi bài hát kết thúc
+      audio.addEventListener("ended", playNext);
+
+      // Phát bài đầu tiên
+      playNext();
+    }
+  };
+}
+
     })
     .catch((err) => console.error("Lỗi khi tải nghệ sĩ:", err));
 }

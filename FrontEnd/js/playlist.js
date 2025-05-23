@@ -1,6 +1,22 @@
 import { playerController } from "./playMusic.js"; // import đúng hàm
 
+
+export function init() {
+  // bindUI();
+  fetchAllSongs();
+  loadPlaylists();
+  playerController.initPlayer();
+}
+
 const token = getCookie("authToken");
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2)
+    return decodeURIComponent(parts.pop().split(";").shift());
+  return null;
+}
 
 const state = {
   token: token,
@@ -11,9 +27,7 @@ const state = {
 const modal = document.getElementById("createPlaylistModal");
 
 // Các hàm xử lý
-function bindUI() {
-  document.addEventListener("DOMContentLoaded", () => {});
-}
+
 
 document.querySelector(".menu-btn")?.addEventListener("click", toggleMenu);
 
@@ -75,7 +89,7 @@ function deletePlaylist() {
 }
 
 function loadPlaylists() {
-  fetch("http://localhost:8080/playlists", {
+  fetch("http://localhost:8080/playlists/me", {
     headers: { Authorization: `Bearer ${state.token}` },
   })
     .then((res) => res.json())
@@ -242,7 +256,7 @@ async function removeSong(id) {
     alert("Đã xoá bài hát khỏi playlist");
 
     // Lấy lại toàn bộ playlist để tìm playlist hiện tại
-    const updatedRes = await fetch("http://localhost:8080/playlists", {
+    const updatedRes = await fetch("http://localhost:8080/playlists/me", {
       headers: {
         Authorization: `Bearer ${state.token}`,
       },
@@ -311,8 +325,13 @@ async function addSongToPlaylist(songId) {
     if (!response.ok) throw new Error("Thêm thất bại");
     alert("Đã thêm bài hát vào playlist!");
 
+    const input = document.getElementById("song-search");
+    if (input) input.value = "";
+    const list = document.getElementById("suggestion-list");
+  list.innerHTML = "";
+
     // Lấy lại danh sách tất cả playlists
-    const updatedRes = await fetch("http://localhost:8080/playlists", {
+    const updatedRes = await fetch("http://localhost:8080/playlists/me", {
       headers: {
         Authorization: `Bearer ${state.token}`,
       },
@@ -337,10 +356,5 @@ async function addSongToPlaylist(songId) {
   }
 }
 
-// Export init function để bên ngoài gọi
-export function init() {
-  bindUI();
-  fetchAllSongs();
-  loadPlaylists();
-  
-}
+
+

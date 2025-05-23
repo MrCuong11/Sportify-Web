@@ -1,4 +1,4 @@
- import { playerController } from './playMusic.js'; // import đúng hàm
+import { playerController } from "./playMusic.js"; // import đúng hàm
 
 let playlist = [];
 let currentSongIndex = 0; // khai báo biến index hiện tại
@@ -11,14 +11,43 @@ export function init() {
   playerController.initPlayer();
 }
 
+function getSubFromToken(token) {
+  if (!token) return null;
+  try {
+    // Token dạng: header.payload.signature
+    const payloadBase64 = token.split('.')[1];
+    if (!payloadBase64) return null;
+
+    // Base64URL decode (thay - thành +, _ thành /)
+    const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+    // Giải mã base64
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    const payload = JSON.parse(jsonPayload);
+    return payload.sub || null;
+  } catch (e) {
+    console.error("Lỗi giải mã token:", e);
+    return null;
+  }
+}
+
 function getCookie(name) {
   const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
   if (match) return match[2];
   return null;
 }
+const token = getCookie('authToken'); // hoặc token bạn có
+const userName = getSubFromToken(token);
+console.log("User ID (sub):", userName);
+
+
 
 async function loadArtists() {
-  const token = getCookie('authToken');
+  const token = getCookie("authToken");
   try {
     const res = await fetch("http://localhost:8080/artists", {
       headers: {
@@ -62,8 +91,8 @@ async function loadShowcasePlaylists() {
   container.innerHTML = "";
 
   try {
-    const token = getCookie('authToken');
-    const res = await fetch("http://localhost:8080/playlists", {
+    const token = getCookie("authToken");
+    const res = await fetch("http://localhost:8080/playlists/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -74,19 +103,44 @@ async function loadShowcasePlaylists() {
 
     // Lọc playlist không bị archive
     const playlists = data.result.content
-      .filter(pl => !pl.archive)
+      .filter((pl) => !pl.archive)
       .slice(0, 6);
 
-    playlists.forEach((playlist) => {
+    playlists.forEach((pl) => {
       const card = document.createElement("div");
       card.classList.add("latest-english-card-container");
       card.innerHTML = `
-        <img src="${playlist.image_url || "https://img.icons8.com/ios/100/music.png"}" alt="cover">
-        <p>${playlist.name}</p>
+        <img src="${
+          pl.image_url || "https://img.icons8.com/ios/100/music.png"
+        }" alt="cover">
+        <p>${pl.name}</p>
       `;
-      card.addEventListener("click", () => {
-        console.log("Click playlist", playlist);
+      card.addEventListener("click", async () => {
+        try {
+          // Gọi tất cả bài hát
+          const songRes = await fetch("http://localhost:8080/songs", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!songRes.ok) throw new Error(`Lỗi: ${songRes.status}`);
+          const allSongsData = await songRes.json();
+          const allSongs = allSongsData.result.content; // Cấu trúc trả về danh sách bài hát
+
+          // Lọc bài hát có id nằm trong playlist.songIds
+          const playlistSongIds = pl.songs;
+
+          const ids = playlistSongIds.map((obj) => obj.songId); // lấy id từ object
+          playlist = allSongs.filter((song) => ids.includes(song.id));
+          console.log(playlist);
+
+          // Gọi hàm cập nhật queue
+          renderQueue(playlist);
+        } catch (err) {
+          console.error("Lỗi khi tải danh sách bài hát:", err);
+        }
       });
+
       container.appendChild(card);
     });
   } catch (error) {
@@ -94,9 +148,8 @@ async function loadShowcasePlaylists() {
   }
 }
 
-
 async function loadNonVietnameseSongs() {
-  const token = getCookie('authToken');
+  const token = getCookie("authToken");
   if (!token) {
     console.warn("Chưa đăng nhập, không thể tải bài hát nước ngoài");
     return;
@@ -126,7 +179,7 @@ async function loadNonVietnameseSongs() {
     const countryList = countriesData.result;
 
     // Tìm id VN
-    const vietnamCountry = countryList.find(c => c.code === "viet-nam");
+    const vietnamCountry = countryList.find((c) => c.code === "viet-nam");
     const vietnamCountryId = vietnamCountry?.id;
     if (!vietnamCountryId) throw new Error("Không tìm thấy quốc gia Việt Nam!");
 
@@ -138,21 +191,25 @@ async function loadNonVietnameseSongs() {
     if (!vietnamArtistsRes.ok) throw new Error("Lỗi lấy nghệ sĩ VN");
 
     const vietnamArtistsData = await vietnamArtistsRes.json();
-    const vietnameseArtistNames = vietnamArtistsData.result.artists.map(a => a.name);
+    const vietnameseArtistNames = vietnamArtistsData.result.artists.map(
+      (a) => a.name
+    );
 
     // Lọc bài không thuộc nghệ sĩ VN
     const nonVietnameseSongs = songList.filter(
-      song => !vietnameseArtistNames.includes(song.artistName)
+      (song) => !vietnameseArtistNames.includes(song.artistName)
     );
 
     console.log("nonVietnameseSongs:", nonVietnameseSongs);
 
-    const latestEnglishContent = document.getElementById("latest-english-content");
+    const latestEnglishContent = document.getElementById(
+      "latest-english-content"
+    );
     if (!latestEnglishContent) return;
 
     latestEnglishContent.innerHTML = "";
 
-    nonVietnameseSongs.slice(0, 6).forEach(song => {
+    nonVietnameseSongs.slice(0, 6).forEach((song) => {
       const card = document.createElement("div");
       card.className = "latest-english-card-container";
       card.innerHTML = `
@@ -170,7 +227,7 @@ async function loadNonVietnameseSongs() {
 }
 
 async function loadAllSongs() {
-  const token = getCookie('authToken');
+  const token = getCookie("authToken");
   try {
     const res = await fetch("http://localhost:8080/songs", {
       headers: {
@@ -182,20 +239,25 @@ async function loadAllSongs() {
 
     const data = await res.json();
     playlist = data.result.content || [];
-    renderQueue();
+    renderQueue(playlist);
     renderLatestReleases();
   } catch (error) {
     console.error("Error loading playlist:", error);
   }
 }
 
-function renderQueue() {
+function renderQueue(playlists) {
   const queueContainer = document.querySelector(".queue-elements-container");
   if (!queueContainer) return;
 
   queueContainer.innerHTML = "";
 
-  playlist.forEach((song, index) => {
+  if (!Array.isArray(playlists)) {
+    console.warn("playlist không phải mảng hoặc undefined", playlist);
+    return;
+  }
+
+  playlists.forEach((song, index) => {
     const queueElement = document.createElement("div");
     queueElement.classList.add("queue-element");
     queueElement.innerHTML = `
@@ -218,7 +280,7 @@ function renderQueue() {
     queueElement.addEventListener("click", () => {
       currentSongIndex = index;
       playerController.loadSongById(song.id);
-      renderQueue();
+      renderQueue(playlist);
     });
 
     queueContainer.appendChild(queueElement);
@@ -253,8 +315,6 @@ function renderLatestReleases() {
       currentSongIndex = index;
       playerController.loadSongByIndex(currentSongIndex);
       playerController.playSong();
-      
     });
   });
 }
-

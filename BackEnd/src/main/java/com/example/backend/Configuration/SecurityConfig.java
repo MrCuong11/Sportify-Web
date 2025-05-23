@@ -33,10 +33,10 @@ public class SecurityConfig {
         httpSecurity
                 .csrf().disable()
                 .authorizeHttpRequests(request -> request
-                        //.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()  // Allow public access to these endpoints
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()  // Allow public access to these endpoints
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Allow Swagger UI and API Docs
                         .requestMatchers("/**").permitAll()
-                        .anyRequest().authenticated()  // All other requests need to be authenticated
+//                        .anyRequest().authenticated()  // All other requests need to be authenticated
                 );
 
         // OAuth2 Resource Server configuration using JWT

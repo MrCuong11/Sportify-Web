@@ -15,11 +15,12 @@ async function loadPage(pageName) {
     // Đảm bảo DOM đã thay xong mới gọi JS
     try {
       const module = await import(`./${pageName}.js`);
+      console.log("✅ Imported module:", module);
       if (typeof module.init === 'function') {
         module.init(); // Gọi init() để chạy code sau khi page đã vào DOM
       }
     } catch (err) {
-      console.warn(`Không tìm thấy scripts/${pageName}.js`);
+      console.warn(`Không tìm thấy js/${pageName}.js`, err);
     }
   } catch (e) {
     app.innerHTML = `<h2>404 - Page not found</h2>`;
@@ -31,7 +32,7 @@ router.on({
   home: async () => await loadPage('home'),
   artist: async () => await loadPage('artist'),
   playlist: async () => await loadPage('playlist'),
-  favorite: async () => await loadPage('favorite')
+  favorite: async () => await loadPage('favorite'),
  
 });
 router.notFound(() => {
