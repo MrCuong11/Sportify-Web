@@ -28,7 +28,7 @@ public class FavoriteController {
     public ApiResponse<String> removeFromFavorites(@PathVariable String songId) {
         favoriteService.removeFromFavorites(songId);
         return ApiResponse.<String>builder()
-                .result("Removed")
+                .result("Removed song from favorite")
                 .build();
     }
 

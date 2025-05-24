@@ -2,6 +2,7 @@ package com.example.backend.Service;
 
 import com.example.backend.DTO.Response.SongSimpleResponse;
 import com.example.backend.Entity.Favorite;
+import com.example.backend.Entity.FavoriteId;
 import com.example.backend.Entity.Song;
 import com.example.backend.Entity.User;
 import com.example.backend.Mapper.SongMapper;
@@ -43,12 +44,14 @@ public class FavoriteService {
         boolean exists = favoriteRepository.existsByUserAndSong(user, song);
         if (!exists) {
             Favorite favorite = Favorite.builder()
+                    .id(new FavoriteId(user.getId(), song.getId()))
                     .user(user)
                     .song(song)
                     .build();
             favoriteRepository.save(favorite);
         }
     }
+
 
     @Transactional
     public void removeFromFavorites(String songId) {
