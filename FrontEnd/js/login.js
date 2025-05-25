@@ -1,13 +1,8 @@
-import { RememberMe, showPassword, getCookie, logOut, encodeCValue, decodeCValue } from "./utils.js";
+import {  showPassword } from "./utils.js";
 
 // Main function
 function main() {
 
-    // If the user had previously selected remember-me, directly login the user
-    if (getCookie("direct") != "") {
-        let username = decodeCValue("direct").username;
-        displayLogin(username);
-    } 
 
     // Trigger login() once the form is submitted, e = event
     document.querySelector("#form").addEventListener("submit", (e) => {
@@ -84,8 +79,7 @@ async function login(e) {
     // Retrieve the value of every entry
     const id = document.querySelector("#id");
     const password = document.querySelector("#password");
-    const rememberMe = document.querySelector("#rememberMe");
-
+    
     // Call the verifyLoginCredentials function to check credentials via API
     const result = await verifyLoginCredentials(id.value, password.value);
 
@@ -94,8 +88,6 @@ async function login(e) {
         console.log("Login successful! Token:", token); // Log the token to the console
         // Save token to cookie
         document.cookie = `authToken=${token}; path=/; max-age=3600`; // Expires in 7 days
-
-
         displayLogin(name);
     } else {
         // If login failed, no need to add any warnings manually, they're set by verifyLoginCredentials

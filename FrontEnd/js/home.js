@@ -1,7 +1,7 @@
 import { playerController } from "./playMusic.js"; // import đúng hàm
 
 let playlist = [];
-let currentSongIndex = 0; // khai báo biến index hiện tại
+
 
 export function init() {
   loadShowcasePlaylists();
@@ -11,43 +11,17 @@ export function init() {
   playerController.initPlayer();
 }
 
-function getSubFromToken(token) {
-  if (!token) return null;
-  try {
-    // Token dạng: header.payload.signature
-    const payloadBase64 = token.split('.')[1];
-    if (!payloadBase64) return null;
-
-    // Base64URL decode (thay - thành +, _ thành /)
-    const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
-    // Giải mã base64
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    const payload = JSON.parse(jsonPayload);
-    return payload.sub || null;
-  } catch (e) {
-    console.error("Lỗi giải mã token:", e);
-    return null;
-  }
-}
+console.log(playlist);
 
 function getCookie(name) {
   const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
   if (match) return match[2];
   return null;
 }
-const token = getCookie('authToken'); // hoặc token bạn có
-const userName = getSubFromToken(token);
-console.log("User ID (sub):", userName);
-
-
+const token = getCookie("authToken"); // hoặc token bạn có
 
 async function loadArtists() {
-  const token = getCookie("authToken");
+ 
   try {
     const res = await fetch("http://localhost:8080/artists", {
       headers: {
@@ -91,7 +65,7 @@ async function loadShowcasePlaylists() {
   container.innerHTML = "";
 
   try {
-    const token = getCookie("authToken");
+    
     const res = await fetch("http://localhost:8080/playlists/me", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -118,21 +92,12 @@ async function loadShowcasePlaylists() {
       card.addEventListener("click", async () => {
         try {
           // Gọi tất cả bài hát
-          const songRes = await fetch("http://localhost:8080/songs", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (!songRes.ok) throw new Error(`Lỗi: ${songRes.status}`);
-          const allSongsData = await songRes.json();
-          const allSongs = allSongsData.result.content; // Cấu trúc trả về danh sách bài hát
 
           // Lọc bài hát có id nằm trong playlist.songIds
           const playlistSongIds = pl.songs;
 
           const ids = playlistSongIds.map((obj) => obj.songId); // lấy id từ object
-          playlist = allSongs.filter((song) => ids.includes(song.id));
-          console.log(playlist);
+          playlist = await playerController.fetchSongsByIds(ids);
 
           // Gọi hàm cập nhật queue
           renderQueue(playlist);
@@ -240,7 +205,7 @@ async function loadAllSongs() {
     const data = await res.json();
     playlist = data.result.content || [];
     renderQueue(playlist);
-    renderLatestReleases();
+    renderLatestReleases(playlist);
   } catch (error) {
     console.error("Error loading playlist:", error);
   }
@@ -273,26 +238,34 @@ function renderQueue(playlists) {
         </div>
       </div>
       <span class="nav-link">
-        <button><i class="far wishlist-icon fa-heart"></i></button>
+        <button class="favorite-btn"><i class="far wishlist-icon fa-heart"></i></button>
       </span>
     `;
 
     queueElement.addEventListener("click", () => {
-      currentSongIndex = index;
+      
       playerController.loadSongById(song.id);
       renderQueue(playlist);
     });
+
+    queueElement
+      .querySelector(".favorite-btn")
+      .addEventListener("click", (e) => {
+        e.stopPropagation(); // Tránh trigger click play
+        addToFavorites(song.id);
+      });
 
     queueContainer.appendChild(queueElement);
   });
 }
 
-function renderLatestReleases() {
+function renderLatestReleases(playlist) {
   const cards = document.querySelectorAll(".latest-release-card");
   if (!cards.length) return;
 
   cards.forEach((card, index) => {
     const song = playlist[index];
+
     if (!song) return;
 
     const nameElement = card.querySelector(".song-name");
@@ -312,9 +285,36 @@ function renderLatestReleases() {
     if (durationElement) durationElement.textContent = song.duration;
 
     card.addEventListener("click", () => {
-      currentSongIndex = index;
-      playerController.loadSongByIndex(currentSongIndex);
+      playerController.loadSongById(song.id);
       playerController.playSong();
     });
   });
+}
+
+function addToFavorites(songId) {
+  const token = getCookie("authToken");
+  if (!token) {
+    alert("Vui lòng đăng nhập để thêm vào yêu thích!");
+    return;
+  }
+
+  fetch(`http://localhost:8080/favorites/${songId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    
+  })
+    .then((res) => {
+      if (res.ok) {
+        alert("Đã thêm vào danh sách yêu thích!");
+      } else {
+        alert("Không thể thêm vào yêu thích.");
+      }
+    })
+    .catch((err) => {
+      console.error("Lỗi khi thêm vào favorites:", err);
+      alert("Có lỗi xảy ra.");
+    });
 }

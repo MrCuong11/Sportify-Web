@@ -33,6 +33,9 @@ let currentSongId = null;
 let playlist = [];
 let lyricsData = [];
 
+
+
+
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
@@ -282,6 +285,45 @@ function initPlayer() {
     });
 }
 
+// Hàm lấy danh sách bài hát theo danh sách ID
+async function fetchSongsByIds(songIds) {
+  const songs = [];
+  for (const id of songIds) {
+    try {
+      const res = await fetch(`http://localhost:8080/songs/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data && data.code === 1000) songs.push(data.result);
+    } catch (err) {
+      console.error(`Lỗi lấy bài hát id=${id}`, err);
+    }
+  }
+  return songs;
+}
+
+// Hàm set playlist mới và phát bài đầu tiên
+async function playNewPlaylist(songIds) {
+  if (!songIds || songIds.length === 0) {
+    alert("Playlist này chưa có bài hát.");
+    return;
+  }
+  playlist = await fetchSongsByIds(songIds);
+  if (playlist.length === 0) {
+    alert("Không tìm thấy bài hát nào trong playlist.");
+    return;
+  }
+  currentSongIndex = 0;
+  loadSongByIndex(currentSongIndex);
+}
+
+function getCurrentIdSong(){
+  return currentSongId;
+}
 
 
 
@@ -296,5 +338,8 @@ export const playerController = {
   pauseSong,
   nextSong,
   prevSong,
+  playNewPlaylist,
+  fetchSongsByIds,
+  getCurrentIdSong
 };
 

@@ -110,6 +110,7 @@
                         <div class="dropdown-menu" id="profileDropdown">
                             <ul>
                                
+                                <li><a href="#profile" >Hồ sơ</a></li>
                                 <li><a href="#" onclick="handleLogout()">Đăng xuất</a></li>
                             </ul>
                         </div>
@@ -127,8 +128,10 @@
             </div>
         </header>  
         
-
-        <div id="app">Loading...</div>
+        <div id="loading-indicator" style="display: none; text-align:center; padding:20px">
+            <p>Đang tải trang...</p>
+        </div>
+        <div id="app"></div>
 
          
         
@@ -150,11 +153,9 @@
                     </div>
                     <div>
                         <span class="nav-link">
-                            <i class="far fa-heart subtitle"></i>
+                            <button id="favorite-btn"><i class="far fa-heart subtitle"></i></button>
                         </span>
-                        <span class="nav-link">
-                            <i class="fas fa-ban subtitle"></i>
-                        </span>
+                       
                     </div>
                 </div>
             
@@ -204,7 +205,7 @@
     
     <script type="module" src="./js/routes.js"></script>
     <script type="module" src="./js/playMusic.js"></script>
-    <script type="module" src="./js/profile.js"></script>
+    <script type="module" src="./js/header.js"></script>
     
 </body>
 

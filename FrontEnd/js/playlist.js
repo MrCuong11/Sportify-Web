@@ -2,21 +2,36 @@ import { playerController } from "./playMusic.js"; // import đúng hàm
 
 
 export function init() {
-  // bindUI();
+  bindUI();
   fetchAllSongs();
   loadPlaylists();
   playerController.initPlayer();
 }
 
-const token = getCookie("authToken");
+let userName = "";
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2)
-    return decodeURIComponent(parts.pop().split(";").shift());
-  return null;
+  const token = getCookie("authToken");
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2)
+      return decodeURIComponent(parts.pop().split(";").shift());
+    return null;
+  }
+
+async function getName() {
+  try {
+    const res = await fetch("http://localhost:8080/users/myInfo", {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+    return data.result.username;
+  } catch (err) {
+    console.error(err);
+  }
 }
+
 
 const state = {
   token: token,
@@ -28,33 +43,35 @@ const modal = document.getElementById("createPlaylistModal");
 
 // Các hàm xử lý
 
+function bindUI(){
 
-document.querySelector(".menu-btn")?.addEventListener("click", toggleMenu);
-
-document.addEventListener("click", closeMenus);
-document
-  .querySelector(".delete-playlist-btn")
-  ?.addEventListener("click", deletePlaylist);
-
-document
-  .getElementById("song-search")
-  ?.addEventListener("input", showSuggestions);
-
-document
-  .getElementById("createPlaylistBtn")
-  ?.addEventListener("click", () => (modal.style.display = "flex"));
-document.getElementById("cancelCreateBtn")?.addEventListener("click", () => {
-  modal.style.display = "none";
-  clearModalInputs();
-});
-document
-  .getElementById("confirmCreateBtn")
-  ?.addEventListener("click", createPlaylist);
-
-document.getElementById("backToPlaylistsBtn")?.addEventListener("click", () => {
-  document.querySelector(".playlist-container").style.display = "block";
-  document.querySelector(".playlist-wrap").style.display = "none";
-});
+  document.querySelector(".menu-btn")?.addEventListener("click", toggleMenu);
+  
+  document.addEventListener("click", closeMenus);
+  document
+    .querySelector(".delete-playlist-btn")
+    ?.addEventListener("click", deletePlaylist);
+  
+  document
+    .getElementById("song-search")
+    ?.addEventListener("input", showSuggestions);
+  
+  document
+    .getElementById("createPlaylistBtn")
+    ?.addEventListener("click", () => (modal.style.display = "flex"));
+  document.getElementById("cancelCreateBtn")?.addEventListener("click", () => {
+    modal.style.display = "none";
+    clearModalInputs();
+  });
+  document
+    .getElementById("confirmCreateBtn")
+    ?.addEventListener("click", createPlaylist);
+  
+  document.getElementById("backToPlaylistsBtn")?.addEventListener("click", () => {
+    document.querySelector(".playlist-container").style.display = "block";
+    document.querySelector(".playlist-wrap").style.display = "none";
+  });
+}
 
 function toggleMenu(e) {
   e.stopPropagation();
@@ -122,7 +139,8 @@ function renderPlaylists(playlists) {
   });
 }
 
-function openPlaylist(playlist) {
+async function openPlaylist(playlist) {
+  userName = await getName();
   state.currentPlaylistId = playlist.id;
   document.querySelector(".playlist-container").style.display = "none";
   document.querySelector(".playlist-wrap").style.display = "flex";
@@ -134,8 +152,8 @@ function openPlaylist(playlist) {
 
   infoBox.querySelector("h2").textContent = playlist.name;
   const [creatorEl, visibilityEl] = infoBox.querySelectorAll("p");
-  creatorEl.textContent = `Tạo bởi ${playlist.creator || "Bạn"}`;
-  visibilityEl.textContent = playlist.public ? "Công khai" : "Riêng tư";
+  creatorEl.textContent = `Tạo bởi ${userName || "Bạn"}`;
+  // visibilityEl.textContent = playlist.public ? "Công khai" : "Riêng tư";
 
   renderSongsInPlaylist(playlist.songs || []);
 }
@@ -212,7 +230,7 @@ async function renderSongsInPlaylist(songs) {
       full.artistName
     }</p></div>
       </div>
-      <div class="song-album">${full.album || "—"}</div>
+     
       <div class="song-duration">${full.duration || "00:00"}</div>
       <div class="song-actions">
         <button class="action-btn">⋮</button>
@@ -224,9 +242,10 @@ async function renderSongsInPlaylist(songs) {
       el.querySelector(".dropdown-menu-playlist").classList.toggle("show");
     });
 
-    el.querySelector(".delete-btn").addEventListener("click", () =>
-      removeSong(full.id)
-    );
+    el.querySelector(".delete-btn").addEventListener("click", (e) =>{
+      e.stopPropagation();
+      removeSong(full.id);
+  });
 
     el.querySelector(".song-info").addEventListener("click", () =>
       playerController.loadSongById(full.id)

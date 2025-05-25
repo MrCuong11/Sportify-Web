@@ -1,4 +1,4 @@
-import { RememberMe, showPassword, getCookie, logOut } from "./utils.js";
+import {  showPassword } from "./utils.js";
 
 // Main function
 function main() {
@@ -23,11 +23,11 @@ function verifyUsername(username) {
     const warning = document.querySelector("#idWarning");
     // Check empty username and warn
     if (username.value == "") {
-        warning.innerHTML = "*Ce champs est obligatoire";
+        warning.innerHTML = "*Hãy điền đủ thông tin ";
         return 0;
     // Check if username contains space, warn if true
     } else if (username.value.search(/\s/g) > -1) {
-        warning.innerHTML = "*Le nom d'utilisateur ne doit pas contenir d'espaces."
+        warning.innerHTML = "*Tên người dùng không được chứa khoảng trắng."
         return 0;
     }
     // Erase any previous warnings if all cases are met
@@ -40,18 +40,15 @@ function verifyEmail(email) {
     const warning = document.querySelector("#emailWarning");
     // Check if empty string was submitted
     if (email.value == "") {
-        warning.innerHTML = "*Ce champs est obligatoire.";
+        warning.innerHTML = "*Hãy điền đầy đủ thông tin";
         return 0;
     // Search for the presence of "text+@+text" and whitespaces. 
     // Email = invalid if it contains any whitespace or doesn't contain "text+@+text".
     } else if (email.value.search(/\w+@\w+/g) < 0 || email.value.search(/\s/g) > -1) {
-        warning.innerHTML = "*Adresse Email Invalide";
+        warning.innerHTML = "*Lỗi định dạng email.";
         return 0;
     // If user already exists, tells the user to login if true
-    } else if (getCookie(email.value) != "" || decodeURIComponent(document.cookie).indexOf(email.value) > -1) {
-        warning.innerHTML = "*Vous êtes déjà inscrit. Veuillez vous connecter.";
-        return 0;
-    }
+    } 
     // Erase any previous warning if all cases are met
     warning.innerHTML = "";
     return 1;
@@ -63,23 +60,23 @@ function verifyPassword(password) {
     switch (true) {
         // Check if password length > 8 chars
         case password.value.length < 8:
-            warning.innerHTML = "*Votre mot de passe doit contenir au moins 8 caractères.";
+            warning.innerHTML = "*Mật khẩu của bạn phải chứa ít nhất 8 ký tự.";
             return 0;
         // Check empty spaces, and warn if true
         case password.value.search(/\s/g) > -1:
-            warning.innerHTML = "*Votre mot de passe ne doit pas contenir d'espaces.";
+            warning.innerHTML = "*Mật khẩu của bạn không được chứa khoảng trắng.";
             return 0;
         // Check if password contains letters, and warn if not
         case password.value.search(/[A-Za-z]/g) < 0:
-            warning.innerHTML = "*Votre mot de passe doit contenir des lettres.";
+            warning.innerHTML = "*Mật khẩu của bạn phải chứa chữ cái.";
             return 0;
         // Check if password contains special characters, and warn if not
         case password.value.search(/([^A-Z0-9a-z\s*])/g) < 0:
-            warning.innerHTML = "*Votre mot de passe doit contenir un caractère spécial.";
+            warning.innerHTML = "*Mật khẩu của bạn phải chứa ký tự đặc biệt.";
             return 0;
         // Check if password contains numbers, and warn if not
         case password.value.search(/([0-9])/g) < 0:
-            warning.innerHTML = "*Votre mot de passe doit obligatoirement contenir un chiffre.";
+            warning.innerHTML = "*Mật khẩu của bạn phải chứa số.";
             return 0;
     }
     // Erase any previous warning if all cases are met
@@ -92,7 +89,7 @@ function verifyIdenticalPassword(password, confirmedP) {
     const warning = document.querySelector("#confirmPasswordWarning");
     // Check if two passwords are identical, if not, warn
     if (password.value != confirmedP.value) {
-        warning.innerHTML = "*Les mots de passe ne sont pas identiques.";
+        warning.innerHTML = "*Mật khẩu không giống nhau.";
         return 0;
     }
     // Erase any previous warning if the case had been met
@@ -132,17 +129,9 @@ async function register(e) {
             throw new Error(result.message || "Lỗi khi đăng ký.");
         }
     
-        logOut();
-    
-        RememberMe({
-            email: email.value,
-            username: username.value,
-            password: password.value,
-            rememberMe: rememberMe.checked
-        });
-    
+        
         document.querySelector(".containerRegister").style.display = "none";
-        document.querySelector("#signInAlertText").innerHTML = `Bienvenue à vos ressources de programmation, ${username.value}!`;
+       
         document.querySelector(".successfulSignIn").style.display = "block";
         document.querySelector(".successfulSignIn").style.animation = "popUp linear 5s forwards";
         document.querySelector(".register").style.animation = "blurOut linear 5s forwards";
@@ -155,43 +144,7 @@ async function register(e) {
     }
     
 }
-// async function register(username, email, password) {
-//     const usernameWarning = document.querySelector("#usernameWarning");
-//     const emailWarning = document.querySelector("#emailWarning");
-//     const passwordWarning = document.querySelector("#passwordWarning");
 
-//     try {
-//         const response = await axios.post("http://localhost:8080/users/createUser", {
-//             username: username,
-//             email: email,
-//             password: password
-//         });
-
-//         if (response.data.code === 1000 && response.data.result.success) {
-//             // Xóa thông báo lỗi nếu thành công
-//             usernameWarning.innerHTML = "";
-//             emailWarning.innerHTML = "";
-//             passwordWarning.innerHTML = "";
-
-//             return {
-//                 success: true,
-//                 message: "Đăng ký thành công!"
-//             };
-//         } else {
-//             // Trả về lỗi nếu không thành công
-//             return {
-//                 success: false,
-//                 message: response.data.result.message || "Đăng ký thất bại"
-//             };
-//         }
-//     } catch (error) {
-//         console.error("Register failed:", error);
-//         return {
-//             success: false,
-//             message: "Đăng ký thất bại. Vui lòng thử lại."
-//         };
-//     }
-// }
 
 
 main();

@@ -186,11 +186,12 @@
 }
 
 .empty-message {
-  background-color: #2e2040;
+  background-color: #837694;
   padding: 50px;
   text-align: center;
   border-radius: 8px;
   margin-bottom: 20px;
+  color: #fff;
 }
 
 .empty-message img {

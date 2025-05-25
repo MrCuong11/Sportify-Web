@@ -7,6 +7,10 @@ const app = document.getElementById('app');
 // Tải HTML + JS tương ứng
 
 async function loadPage(pageName) {
+
+  const loadingEl = document.getElementById('loading-indicator');
+  if (loadingEl) loadingEl.style.display = 'block';
+
   try {
     const res = await fetch(`pages/${pageName}.html`);
     const html = await res.text();
@@ -24,6 +28,8 @@ async function loadPage(pageName) {
     }
   } catch (e) {
     app.innerHTML = `<h2>404 - Page not found</h2>`;
+  } finally {
+    if (loadingEl) loadingEl.style.display = 'none';
   }
 }
 
@@ -33,7 +39,7 @@ router.on({
   artist: async () => await loadPage('artist'),
   playlist: async () => await loadPage('playlist'),
   favorite: async () => await loadPage('favorite'),
- 
+  profile: async () => await loadPage('profile')
 });
 router.notFound(() => {
   router.navigate('/home'); // Hoặc loadPage('404')
