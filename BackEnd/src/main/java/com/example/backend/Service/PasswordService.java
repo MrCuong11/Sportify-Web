@@ -43,7 +43,7 @@ public class PasswordService {
         resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
         tokenRepository.save(resetToken);
 
-        String link = "http://localhost:8080/pages/reset-password.html?token=" + token;
+        String link = "http://127.0.0.1:5500//FrontEnd/pages/reset-password.html?token=" + token;
 
         emailService.sendEmail(
                 user.getEmail(),
