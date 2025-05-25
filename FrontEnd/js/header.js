@@ -5,6 +5,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const loginRegister = document.getElementById("loginRegister");
   const favorBtn= document.getElementById("favorite-btn")
 
+  if (!token) {
+  const modal = document.getElementById("customLoginModal");
+  modal.style.display = "flex";
+
+  document.getElementById("customGoLoginBtn").onclick = () => {
+    window.location.href = "/FrontEnd/pages/login.html";
+  };
+}
+
+
 
   if (authSection && loginRegister) {
     if (token) {

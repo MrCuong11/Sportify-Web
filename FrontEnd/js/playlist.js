@@ -39,11 +39,13 @@ const state = {
   listSongs: [],
 };
 
-const modal = document.getElementById("createPlaylistModal");
+
 
 // Các hàm xử lý
 
 function bindUI(){
+  const modal = document.getElementById("createPlaylistModal");
+
 
   document.querySelector(".menu-btn")?.addEventListener("click", toggleMenu);
   
@@ -58,7 +60,11 @@ function bindUI(){
   
   document
     .getElementById("createPlaylistBtn")
-    ?.addEventListener("click", () => (modal.style.display = "flex"));
+    ?.addEventListener("click", () => {
+      modal.style.display = "flex";
+      // console.log("createPlaylistBtn clicked")
+    });
+
   document.getElementById("cancelCreateBtn")?.addEventListener("click", () => {
     modal.style.display = "none";
     clearModalInputs();
@@ -70,6 +76,7 @@ function bindUI(){
   document.getElementById("backToPlaylistsBtn")?.addEventListener("click", () => {
     document.querySelector(".playlist-container").style.display = "block";
     document.querySelector(".playlist-wrap").style.display = "none";
+ 
   });
 }
 
@@ -110,15 +117,22 @@ function loadPlaylists() {
     headers: { Authorization: `Bearer ${state.token}` },
   })
     .then((res) => res.json())
-    .then((data) => renderPlaylists(data.result.content))
+    .then((data) => {
+      renderPlaylists(data.result.content);
+      bindUI();   
+    })
     .catch(console.error);
 }
 
 function renderPlaylists(playlists) {
   const grid = document.querySelector(".playlist-grid");
-  const createBtn = document.querySelector(".create-new");
-  grid.innerHTML = "";
-  grid.appendChild(createBtn);
+  // const createBtn = document.querySelector(".create-new");
+  grid.innerHTML = `
+    <div class="playlist-item create-new">
+    <button id="createPlaylistBtn">+<br/>Tạo playlist mới</button>
+  </div>
+  `;
+  // grid.appendChild(createBtn);
 
   // Lọc bỏ playlist bị archive
   const activePlaylists = playlists.filter((p) => !p.archive);
@@ -134,10 +148,16 @@ function renderPlaylists(playlists) {
       }
       <div class="playlist-info"><h3>${playlist.name}</h3></div>`;
 
-    item.addEventListener("click", () => openPlaylist(playlist));
-    grid.appendChild(item);
-  });
+      item.addEventListener("click", () => openPlaylist(playlist));
+      grid.appendChild(item);
+      
+    });
+
+    bindUI();
+    // console.log("bindUI called")
 }
+
+
 
 async function openPlaylist(playlist) {
   userName = await getName();
