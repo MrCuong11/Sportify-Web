@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -50,9 +51,14 @@ public class ListeningHistoryService {
         }
     }
 
-    public Page<ListeningHistoryResponseDTO> getAllListeningHistory(String userId, int page, int size) {
+    public Page<ListeningHistoryResponseDTO> getAllListeningHistory(int page, int size) {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        User user = userRepository.findByUsername(name).orElseThrow(
+                () -> new RuntimeException("USER_NOT_EXISTED"));
         Page<ListeningHistory> historyPage = listeningHistoryRepository.findByUserId(
-                userId,
+                user.getId(),
                 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "playedAt"))
         );
 

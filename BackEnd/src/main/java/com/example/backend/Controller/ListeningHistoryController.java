@@ -21,11 +21,10 @@ public class ListeningHistoryController {
 
     @GetMapping
     public ApiResponse<Page<ListeningHistoryResponseDTO>> getAllListeningHistory(
-            @RequestParam String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<ListeningHistoryResponseDTO> result = listeningHistoryService.getAllListeningHistory(userId, page, size);
+        Page<ListeningHistoryResponseDTO> result = listeningHistoryService.getAllListeningHistory(page, size);
         return ApiResponse.<Page<ListeningHistoryResponseDTO>>builder()
                 .result(result)
                 .build();
