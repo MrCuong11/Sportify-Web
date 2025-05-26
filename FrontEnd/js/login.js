@@ -1,13 +1,8 @@
-import { RememberMe, showPassword, getCookie, logOut, encodeCValue, decodeCValue } from "./utils.js";
+import {  showPassword } from "./utils.js";
 
 // Main function
 function main() {
 
-    // If the user had previously selected remember-me, directly login the user
-    if (getCookie("direct") != "") {
-        let username = decodeCValue("direct").username;
-        displayLogin(username);
-    } 
 
     // Trigger login() once the form is submitted, e = event
     document.querySelector("#form").addEventListener("submit", (e) => {
@@ -65,7 +60,7 @@ async function verifyLoginCredentials(id, password) {
 // A function that displays the login successful text and redirects the user to the homepage
 function displayLogin(id) {
     document.querySelector(".containerLogin").style.display = "none";
-    document.querySelector("#loginAlertText").innerHTML = `Rebonjour, ${id}!`;
+    
     // Change the successful login alert text
     document.querySelector(".successfulLogin").style.display = "block"; // Make the alert text visible
     document.querySelector(".successfulLogin").style.animation = "popUp linear 5s forwards"; // Animation
@@ -84,34 +79,15 @@ async function login(e) {
     // Retrieve the value of every entry
     const id = document.querySelector("#id");
     const password = document.querySelector("#password");
-    const rememberMe = document.querySelector("#rememberMe");
-
+    
     // Call the verifyLoginCredentials function to check credentials via API
     const result = await verifyLoginCredentials(id.value, password.value);
 
     if (result.success) {
         const token = result.token; // Get the token from the result
         console.log("Login successful! Token:", token); // Log the token to the console
-
-        //const name = decodeCValue(id.value).username; // Assuming the username is still decoded from cookies or session
-
-        // Log out every user who has existing remember-me sessions
-        logOut();
-        // RememberMe() verifies if the box is checked and performs the according actions
-        RememberMe({
-            email: id.value,
-            password: password.value,
-            rememberMe: rememberMe.checked
-        });
-
-        // Save the token in localStorage or sessionStorage for future requests
-        if (rememberMe.checked) {
-            localStorage.setItem('authToken', token);
-        } else {
-            sessionStorage.setItem('authToken', token);
-        }
-
-        // Login successful, proceed to display a successful login text and redirect to another page
+        // Save token to cookie
+        document.cookie = `authToken=${token}; path=/; max-age=3600`; // Expires in 7 days
         displayLogin(name);
     } else {
         // If login failed, no need to add any warnings manually, they're set by verifyLoginCredentials

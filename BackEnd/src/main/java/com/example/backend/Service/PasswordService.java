@@ -31,19 +31,17 @@ public class PasswordService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
 
-        // Xóa token cũ nếu tồn tại
-        tokenRepository.deleteByUser(user);
-
-        // Tạo token mới
         String token = UUID.randomUUID().toString();
 
-        PasswordResetToken resetToken = new PasswordResetToken();
-        resetToken.setToken(token);
-        resetToken.setUser(user);
-        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
-        tokenRepository.save(resetToken);
+        PasswordResetToken resetToken = tokenRepository.findByUser(user)
+                .orElse(new PasswordResetToken());
 
-        String link = "http://127.0.0.1:5500/reset-password.html?token=" + token;
+        resetToken.setUser(user);
+        resetToken.setToken(token);
+        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
+        tokenRepository.save(resetToken); // save or update
+
+        String link = "http://127.0.0.1:5500/pages/reset-password.html?token=" + token;
 
         emailService.sendEmail(
                 user.getEmail(),
@@ -51,6 +49,7 @@ public class PasswordService {
                 "Click the link to reset your password: " + link
         );
     }
+
 
 
     @Transactional

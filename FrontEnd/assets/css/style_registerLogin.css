@@ -86,7 +86,7 @@ html {
     justify-content: center;
     align-items: center;
 
-    background-image: url("https://images.unsplash.com/photo-1548598187-35e00175d911?q=80&w=3174&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    background-image: url("https://png.pngtree.com/thumb_back/fw800/background/20240716/pngtree-a-colorful-picture-of-music-notes-and-background-image_16009293.jpg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -156,7 +156,7 @@ html {
 }
 
 /* Text input boxes styling and positioning */
-#form input[type=text], #form input[type=password]{
+#form input[type=text], #form input[type=password], #form input[type=email]{
     width: 94%;
     height: 20px;
     font-size: 15px;

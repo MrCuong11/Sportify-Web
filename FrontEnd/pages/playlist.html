@@ -1,0 +1,89 @@
+
+      <div class="playlist-container">
+        <h2>Playlist</h2>
+        <div class="tab-menu">
+          <!-- <button class="tab active">Tất cả</button> -->
+          <button class="tab active">Của tôi</button>
+        </div>
+
+        <div class="playlist-grid">
+          <div class="playlist-item create-new">
+            <button id="createPlaylistBtn">+<br />Tạo playlist mới</button>
+          </div>
+        </div>
+      </div>
+      <div class="playlist-wrap">
+        <button id="backToPlaylistsBtn" class="back-btn">
+          ← Quay lại Playlist
+        </button>
+
+        <div class="playlist-infomation">
+          <div class="cover">
+            <img
+              src="https://img.icons8.com/ios/50/music-record.png"
+              alt="cover"
+            />
+          </div>
+          <h2>cường ✎</h2>
+          <p>Tạo bởi Cường</p>
+          <p></p>
+          <div class="playlist-menu">
+            <button class="menu-btn">
+              <i class="fas fa-ellipsis-h"></i>
+              <!-- FontAwesome icon ba chấm ngang -->
+            </button>
+            <ul class="menu-dropdown-delete">
+              <li>
+                <button class="delete-playlist-btn">🗑️ Xóa Playlist</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="playlist-main">
+          <div class="empty-message">
+            <img
+              src="https://img.icons8.com/ios/50/musical-notes.png"
+              alt="no music"
+            />
+            <p>Không có bài hát trong playlist của bạn</p>
+          </div>
+          <div class="song-list">
+            <!-- Danh sách bài hát sẽ được render vào đây -->
+          </div>
+
+          <div class="suggestion-header">
+            <h3>Bài Hát Gợi Ý</h3>
+            <p>Dựa trên tiêu đề của playlist này</p>
+          </div>
+
+          <input
+            type="text"
+            id="song-search"
+            placeholder="Nhập tên bài hát để gợi ý..."
+          />
+          <div id="suggestion-list" class="suggestion-list"></div>
+        </div>
+      </div>
+      <div id="createPlaylistModal" class="modal-overlay">
+        <div class="modal-content">
+          <h3>Tạo Playlist mới</h3>
+          <input
+            type="text"
+            id="playlistNameInput"
+            placeholder="Tên playlist"
+          />
+          <input
+            type="text"
+            id="playlistImageInput"
+            placeholder="Link ảnh (tuỳ chọn)"
+          />
+          <div class="modal-buttons">
+            <button id="cancelCreateBtn">Hủy</button>
+            <button id="confirmCreateBtn">Tạo</button>
+          </div>
+        </div>
+      </div>
+      
+    
+
