@@ -102,6 +102,59 @@ body {
     /* font-size: 2rem; */
 }
 
+#searchSuggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 999;
+  font-family: Arial, sans-serif;
+  border-radius: 4px;
+}
+
+.search-suggestion-header {
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #666;
+  border-bottom: 1px solid #eee;
+  text-transform: uppercase;
+}
+
+.search-suggestion-item {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #f1f1f1;
+  transition: background-color 0.15s ease;
+}
+
+.search-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.search-suggestion-item:hover {
+  background-color: #f5f5f5;
+}
+
+.search-suggestion-artist::before {
+  content: "🎤";
+  font-size: 16px;
+}
+
+.search-suggestion-song::before {
+  content: "🎵";
+  font-size: 16px;
+}
 
 
 .profile-container {
@@ -636,28 +689,9 @@ input[type=radio] {
 }
 
 
-/* on clicking the play btns , make its height 0 (display none) */
-
-#play-btn-checkbox1:checked~.for-responsiveness>main>.latest-release-container div:nth-child(even) div:first-child>.song-name-and-img-container>.latest-release-img-container>label>i.play-1,
-#play-btn-checkbox2:checked~.for-responsiveness>main>.latest-release-container div:nth-child(even) div:last-child>.song-name-and-img-container>.latest-release-img-container>label>i.play-2,
-#play-btn-checkbox3:checked~.for-responsiveness>main>.latest-release-container div:last-child div:first-child>.song-name-and-img-container>.latest-release-img-container>label>i.play-3,
-#play-btn-checkbox4:checked~.for-responsiveness>main>.latest-release-container div:last-child div:last-child>.song-name-and-img-container>.latest-release-img-container>label>i.play-4 {
-    height: 0;
-    overflow: hidden;
-}
 
 
-/* on clicking the play btns, make the height of pause btn non zero */
 
-#play-btn-checkbox1:checked~.for-responsiveness>main>.latest-release-container div:nth-child(even) div:first-child>.song-name-and-img-container>.latest-release-img-container>label>i.pause-1,
-#play-btn-checkbox2:checked~.for-responsiveness>main>.latest-release-container div:nth-child(even) div:last-child>.song-name-and-img-container>.latest-release-img-container>label>i.pause-2,
-#play-btn-checkbox3:checked~.for-responsiveness>main>.latest-release-container div:last-child div:first-child>.song-name-and-img-container>.latest-release-img-container>label>i.pause-3,
-#play-btn-checkbox4:checked~.for-responsiveness>main>.latest-release-container div:last-child div:last-child>.song-name-and-img-container>.latest-release-img-container>label>i.pause-4 {
-    height: 1rem;
-}
-
-
-/* on clicking the play btns , make its height 0 (display none) */
 
 .song-name {
     color: #FCFCFD;
@@ -843,7 +877,6 @@ input[type=radio] {
     font-size: 16px;
   }
   
-  /* Không cần hover mới hiện */
   .popular-artists-img-wrapper a {
     opacity: 1;
     transition: background-color 0.3s ease;

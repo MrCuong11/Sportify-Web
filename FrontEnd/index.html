@@ -4,13 +4,10 @@
 
 <head>
     <title>Ninja Studio - Music Player</title>
-   
-
     <meta charset="UTF-8">
-    <!-- set viewport meta property -->
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- linking the css file -->
+    
     <link rel="stylesheet" href="assets/css/style.css">
 
     <style>
@@ -20,62 +17,6 @@
             justify-items: center;
             align-items: center;
         }
-
-#searchSuggestions {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  max-height: 250px;
-  overflow-y: auto;
-  z-index: 999;
-  font-family: Arial, sans-serif;
-  border-radius: 4px;
-}
-
-.search-suggestion-header {
-  padding: 8px 12px;
-  font-weight: 600;
-  font-size: 13px;
-  color: #666;
-  border-bottom: 1px solid #eee;
-  text-transform: uppercase;
-}
-
-.search-suggestion-item {
-  padding: 10px 12px;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid #f1f1f1;
-  transition: background-color 0.15s ease;
-}
-
-.search-suggestion-item:last-child {
-  border-bottom: none;
-}
-
-.search-suggestion-item:hover {
-  background-color: #f5f5f5;
-}
-
-.search-suggestion-artist::before {
-  content: "🎤";
-  font-size: 16px;
-}
-
-.search-suggestion-song::before {
-  content: "🎵";
-  font-size: 16px;
-}
-
-
     </style>
 
 

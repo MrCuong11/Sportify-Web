@@ -449,7 +449,7 @@
 
 .menu-dropdown-delete {
   position: absolute;
-  right: 0;
+ 
   top: 30px;
   background: #fff;
   border: 1px solid #ddd;
@@ -463,9 +463,7 @@
   z-index: 999;
 }
 
-.menu-dropdown-delete li {
-  border-bottom: 1px solid #eee;
-}
+
 
 .menu-dropdown-delete li:last-child {
   border-bottom: none;
@@ -475,13 +473,13 @@
   background: none;
   border: none;
   width: 100%;
-  text-align: left;
+  text-align: center;
   padding: 10px 14px;
   cursor: pointer;
   font-size: 14px;
-  color: #e74c3c;
+  color: black;
 }
 
 .delete-playlist-btn:hover {
-  background-color: #f9f9f9;
+  background-color: #d8e2de;
 }

@@ -159,7 +159,7 @@ function loadRelatedArtists(currentArtistId) {
 }
 
 function addToFavorites(songId) {
-  const token = getCookie("authToken");
+  
   if (!token) {
     alert("Vui lòng đăng nhập để thêm vào yêu thích!");
     return;
