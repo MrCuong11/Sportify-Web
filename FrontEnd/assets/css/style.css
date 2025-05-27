@@ -870,159 +870,6 @@ input[type=radio] {
 }
 
 
-/* stations */
-
-.stations-container {
-    width: 100%;
-    background-color: #101743;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    margin-bottom: 4rem;
-}
-
-.stations-logo-container {
-    width: 18%;
-    position: relative;
-    overflow: hidden;
-}
-
-.stations-logo-container:before {
-    content: "";
-    display: block;
-    padding-top: 100%;
-}
-
-.stations-logo-img-container {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url(../images/stations-img.png);
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-}
-
-.stations-img-container {
-    width: 12%;
-    position: relative;
-}
-
-.stations-img {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-}
-
-.stations-img:before {
-    content: "";
-    display: block;
-    padding-top: 100%;
-}
-
-.img-1 {
-    filter: blur(1.1px);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url(../images/love.jpg);
-    background-position: center;
-    background-size: 100% 100%;
-    background-size: cover;
-    border-radius: 4rem;
-}
-
-.img-2 {
-    background-image: url(../images/retro.png) !important;
-}
-
-.img-3 {
-    background-image: url(../images/chill.jpg) !important;
-}
-
-.img-4 {
-    background-image: url(../images/workout.jpg) !important;
-}
-
-.img-5 {
-    background-image: url(../images/rock.jpg) !important;
-}
-
-.img-6 {
-    background-image: url(../images/pop.jpg) !important;
-}
-
-.stations-para {
-    font-weight: bold;
-    text-align: center;
-    position: absolute;
-    color: white;
-    top: 50%;
-    margin-top: -5px;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 0.9rem;
-}
-
-
-/* genre */
-
-.genre-container {
-    width: 100%;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.genre-img-container {
-    width: 32%;
-    height: 9rem;
-    background-image: url(../images/party.jpg);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100% 100%;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s ease-in-out;
-}
-
-.genre-img-container:hover {
-    background-size: 120% 120%;
-}
-
-.genre-img-container p {
-    color: #FAFAFB;
-    text-align: center;
-    font-size: 1.3rem;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.genre-img-2 {
-    background-image: url("../images/electronic.jpg");
-}
-
-.genre-img-3 {
-    background-image: url("../images/road-trip.jpg");
-}
-
-
 /* latest-english */
 
 .latest-english-container {
@@ -1077,20 +924,7 @@ input[type=radio] {
     /* text-align: center; */
 }
 
-.view-all-btn {
-  display: inline-block;
-  padding: 6px 14px;
-  background-color: #31185f;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
 
-.view-all-btn:hover {
-  background-color: #7eb492;
-}
 
 /* lyric */
 .lyrics-popup {
@@ -1173,11 +1007,6 @@ input[type=radio] {
     color: #1DB954; /* Màu xanh Spotify khi đang mở */
 }
 
-
-
-
-  
-  
 
 
 /* footer (audio player controls)*/

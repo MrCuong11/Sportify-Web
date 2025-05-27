@@ -1,10 +1,8 @@
-// scripts/router.js
+
 import Navigo from 'https://cdn.jsdelivr.net/npm/navigo@8.11.1/+esm';
 
 const router = new Navigo('/', { hash: true });
 const app = document.getElementById('app');
-
-// Tải HTML + JS tương ứng
 
 async function loadPage(pageName) {
 
@@ -19,7 +17,7 @@ async function loadPage(pageName) {
     // Đảm bảo DOM đã thay xong mới gọi JS
     try {
       const module = await import(`./${pageName}.js`);
-      console.log("✅ Imported module:", module);
+      // console.log("✅ Imported module:", module);
       if (typeof module.init === 'function') {
         module.init(); // Gọi init() để chạy code sau khi page đã vào DOM
       }
@@ -45,7 +43,7 @@ router.notFound(() => {
   router.navigate('/home'); // Hoặc loadPage('404')
 }); 
 if (!location.hash) {
-  router.navigate('/home'); // Gắn hash nếu chưa có
+  router.navigate('/home'); 
 } else {
   router.resolve(); // Xử lý route nếu đã có
 }

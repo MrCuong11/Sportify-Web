@@ -1,4 +1,4 @@
-// player.js
+
 const audio = document.getElementById("audio");
 const playPauseBtn = document.querySelector(".playingSong__tool-playPause");
 const nextBtn = document.querySelector(".playingSong__tool-next");
@@ -32,9 +32,6 @@ let isRepeat = false;
 let currentSongId = null;
 let playlist = [];
 let lyricsData = [];
-
-
-
 
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
@@ -325,9 +322,6 @@ function getCurrentIdSong(){
   return currentSongId;
 }
 
-
-
-
 // Export các hàm nếu cần
 export const playerController = {
   initPlayer,
@@ -340,6 +334,7 @@ export const playerController = {
   prevSong,
   playNewPlaylist,
   fetchSongsByIds,
-  getCurrentIdSong
+  getCurrentIdSong,
+  getCookie
 };
 

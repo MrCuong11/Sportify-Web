@@ -1,12 +1,7 @@
 import { playerController } from "./playMusic.js";
 
-const token = getCookie("authToken");
+const token = playerController.getCookie("authToken");
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-}
 
 export const artistController = {
   init,
@@ -64,6 +59,7 @@ function fetchArtistDetails(artistId) {
 
       const songList = document.getElementById("songList");
       songList.innerHTML = "";
+      console.log(artist.songs);
 
       artist.songs.forEach((song, index) => {
         const li = document.createElement("li");
@@ -72,10 +68,10 @@ function fetchArtistDetails(artistId) {
           <div class="song-index">${index + 1}</div>
           <div class="song-info">
             <p class="song-title">${song.title}</p>
+            </div>
             <p class="song-duration">${song.duration}</p>
-          </div>
           <div class="song-actions">
-            <i class="far fa-heart"></i>
+            <i class="favorite-btn far fa-heart"></i>
             <i class="fas fa-ellipsis-h"></i>
           </div>
         `;
@@ -84,37 +80,45 @@ function fetchArtistDetails(artistId) {
           playerController.loadSongById(song.id);
         });
 
+        li.querySelector(".favorite-btn").addEventListener("click", (e) => {
+          e.stopPropagation(); // Tránh trigger click play
+          addToFavorites(song.id);
+        });
+
         songList.appendChild(li);
       });
-     const playButton = document.querySelector(".play-button");
+      const playButton = document.querySelector(".play-button");
 
-if (playButton) {
-  playButton.onclick = () => {
-    if (artist.songs.length > 0) {
-      let index = 0;
+      if (playButton) {
+        playButton.onclick = () => {
 
-      const playNext = () => {
-        if (index < artist.songs.length) {
-          const songId = artist.songs[index].id;
-          playerController.loadSongById(songId);
-          index++;
-        } else {
-          audio.removeEventListener("ended", playNext);
-        }
-      };
+          const ids = artist.songs.map((obj) => obj.id);
+          playerController.playNewPlaylist(ids);
+          // if (artist.songs.length > 0) {
+          //   // playerController.fetchSongsByIds(artist.songs.id);
+          //   let index = 0;
 
-      // Đảm bảo lấy đúng phần tử audio do player.js dùng
-      const audio = document.getElementById("audio");
+          //   const playNext = () => {
+          //     if (index < artist.songs.length) {
+          //       const songId = artist.songs[index].id;
+          //       playerController.loadSongById(songId);
+          //       index++;
+          //     } else {
+          //       audio.removeEventListener("ended", playNext);
+          //     }
+          //   };
 
-      // Gán sự kiện khi bài hát kết thúc
-      audio.addEventListener("ended", playNext);
+          //   // Đảm bảo lấy đúng phần tử audio do player.js dùng
+          //   const audio = document.getElementById("audio");
 
-      // Phát bài đầu tiên
-      playNext();
-    }
-  };
-}
+          //   // Gán sự kiện khi bài hát kết thúc
+          //   audio.addEventListener("ended", playNext);
 
+          //   // Phát bài đầu tiên
+          //   playNext();
+          // }
+        };
+      }
     })
     .catch((err) => console.error("Lỗi khi tải nghệ sĩ:", err));
 }
@@ -152,6 +156,33 @@ function loadRelatedArtists(currentArtistId) {
       });
     })
     .catch((err) => console.error("Lỗi nghệ sĩ liên quan:", err));
+}
+
+function addToFavorites(songId) {
+  const token = getCookie("authToken");
+  if (!token) {
+    alert("Vui lòng đăng nhập để thêm vào yêu thích!");
+    return;
+  }
+
+  fetch(`http://localhost:8080/favorites/${songId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => {
+      if (res.ok) {
+        alert("Đã thêm vào danh sách yêu thích!");
+      } else {
+        alert("Không thể thêm vào yêu thích.");
+      }
+    })
+    .catch((err) => {
+      console.error("Lỗi khi thêm vào favorites:", err);
+      alert("Có lỗi xảy ra.");
+    });
 }
 
 artistController.init();

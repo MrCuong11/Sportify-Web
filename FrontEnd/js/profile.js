@@ -1,12 +1,6 @@
-import { playerController } from "./playMusic.js";
+import { playerController } from "./playMusic.js"
 
-function getCookie(name) {
-  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  if (match) return match[2];
-  return null;
-}
-
-const token = getCookie("authToken");
+const token = playerController.getCookie("authToken");
 
 async function fetchMyInfo() {
   const res = await fetch("http://localhost:8080/users/myInfo", {
@@ -26,25 +20,18 @@ async function fetchMyPlaylists() {
   return data.result.content || [];
 }
 
-function setProfileImage(imgUrl, username) {
+function setProfileImage( username) {
   const img = document.getElementById("profile-image");
   const fallback = document.getElementById("profile-fallback");
-
-  if (imgUrl) {
-    img.src = imgUrl;
-    img.style.display = "block";
-    fallback.style.display = "none";
-  } else {
-    img.style.display = "none";
-    fallback.textContent = username.charAt(0).toUpperCase();
-    fallback.style.display = "flex";
-  }
+  img.style.display = "none";
+  fallback.textContent = username.charAt(0).toUpperCase();
+  fallback.style.display = "flex";
 }
 
 function renderProfile(userInfo, playlists) {
   document.getElementById("displayName").textContent = userInfo.username;
 
-  setProfileImage(userInfo.avatarUrl, userInfo.username);
+  setProfileImage( userInfo.username);
 
   const activePlaylists = playlists.filter((pl) => !pl.archive);
   document.getElementById(
@@ -99,7 +86,7 @@ async function renderProfilePage() {
 
 async function loadListeningHistory() {
   const user = await fetchMyInfo();
-  console.log(user);
+  // console.log(user);
   const userId = user.id;
 //   console.log("userId:", userId);
   try {
@@ -117,8 +104,8 @@ async function loadListeningHistory() {
     if (!res.ok) throw new Error("Không thể tải lịch sử nghe nhạc");
 
     const data = await res.json();
-    console.log(data);
-    const songs = data.result.content; // tùy API trả về có thể là `result.content`
+    // console.log(data);
+    const songs = data.result.content; 
 
     const container = document.getElementById("history-grid");
     if (!container) return;
@@ -154,5 +141,3 @@ export function init() {
   playerController.initPlayer();
 }
 
-// Nếu muốn tự động chạy khi load trang:
-// window.addEventListener("DOMContentLoaded", init);

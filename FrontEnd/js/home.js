@@ -1,6 +1,7 @@
 import { playerController } from "./playMusic.js"; // import đúng hàm
 
 let playlist = [];
+let currentSongIndex='';
 
 
 export function init() {
@@ -11,14 +12,8 @@ export function init() {
   playerController.initPlayer();
 }
 
-console.log(playlist);
 
-function getCookie(name) {
-  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  if (match) return match[2];
-  return null;
-}
-const token = getCookie("authToken"); // hoặc token bạn có
+const token = playerController.getCookie("authToken"); // hoặc token bạn có
 
 async function loadArtists() {
  
@@ -91,12 +86,12 @@ async function loadShowcasePlaylists() {
       `;
       card.addEventListener("click", async () => {
         try {
-          // Gọi tất cả bài hát
-
+         
           // Lọc bài hát có id nằm trong playlist.songIds
           const playlistSongIds = pl.songs;
 
           const ids = playlistSongIds.map((obj) => obj.songId); // lấy id từ object
+          await playerController.playNewPlaylist(ids);
           playlist = await playerController.fetchSongsByIds(ids);
 
           // Gọi hàm cập nhật queue
@@ -114,11 +109,7 @@ async function loadShowcasePlaylists() {
 }
 
 async function loadNonVietnameseSongs() {
-  const token = getCookie("authToken");
-  if (!token) {
-    console.warn("Chưa đăng nhập, không thể tải bài hát nước ngoài");
-    return;
-  }
+ 
 
   try {
     const headers = {
@@ -192,7 +183,7 @@ async function loadNonVietnameseSongs() {
 }
 
 async function loadAllSongs() {
-  const token = getCookie("authToken");
+ 
   try {
     const res = await fetch("http://localhost:8080/songs", {
       headers: {
@@ -245,7 +236,7 @@ function renderQueue(playlists) {
     queueElement.addEventListener("click", () => {
       
       playerController.loadSongById(song.id);
-      renderQueue(playlist);
+      
     });
 
     queueElement
@@ -285,6 +276,7 @@ function renderLatestReleases(playlist) {
     if (durationElement) durationElement.textContent = song.duration;
 
     card.addEventListener("click", () => {
+      currentSongIndex = index;
       playerController.loadSongById(song.id);
       playerController.playSong();
     });
@@ -292,7 +284,7 @@ function renderLatestReleases(playlist) {
 }
 
 function addToFavorites(songId) {
-  const token = getCookie("authToken");
+ 
   if (!token) {
     alert("Vui lòng đăng nhập để thêm vào yêu thích!");
     return;

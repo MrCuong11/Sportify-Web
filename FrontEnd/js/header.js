@@ -1,6 +1,7 @@
 import { playerController } from "./playMusic.js";
+const token = playerController.getCookie("authToken");
+
 document.addEventListener("DOMContentLoaded", function () {
-  const token = getCookie("authToken");
   const authSection = document.getElementById("authSection");
   const loginRegister = document.getElementById("loginRegister");
   const favorBtn= document.getElementById("favorite-btn")
@@ -13,8 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
     window.location.href = "/FrontEnd/pages/login.html";
   };
 }
-
-
 
   if (authSection && loginRegister) {
     if (token) {
@@ -39,13 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
   setupSearchFeature(token);
 });
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2)
-    return decodeURIComponent(parts.pop().split(";").shift());
-  return null;
-}
+
 
 function eraseCookie(name) {
   document.cookie = `${name}=; Max-Age=0; path=/`;
@@ -56,7 +49,7 @@ function redirectToLogin() {
 }
 
 async function handleLogout() {
-  const token = getCookie("authToken");
+ 
 
   if (!token) {
     console.warn("No token found. Redirecting...");
@@ -101,10 +94,10 @@ function getUsernameFromToken(token) {
   }
 }
 
-// Ví dụ sử dụng:
-const token = getCookie("authToken");
+
+
 const username = getUsernameFromToken(token);
-// console.log("Username:", username); // --> "hieulx"
+
 
 function setDefaultProfileAvatar(username) {
   const avatar = document.getElementById("profileAvatar");

@@ -73,24 +73,20 @@ html {
     height: 100%;
 }
 
-/* Styling applying to both pages, background images and make both pages flexboxes to better center elements*/
 .register,
 .login {
     width: 100%;
     height: 100%;
     margin: 0px;
     padding: 0px;
-
     display: flex; /* Body elements are flexible */
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     background-image: url("https://png.pngtree.com/thumb_back/fw800/background/20240716/pngtree-a-colorful-picture-of-music-notes-and-background-image_16009293.jpg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-
     font-family: Quicksand;
 }
 

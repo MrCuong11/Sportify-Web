@@ -1,7 +1,6 @@
-// Export elements of this module
+
 export { showPassword };
 
-// EASTER EGG FUNCTION: When eye had been clicked, reveal password
 function showPassword(type) {
     
     if (type == 0) {
